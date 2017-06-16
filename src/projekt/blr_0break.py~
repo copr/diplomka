@@ -1,0 +1,34 @@
+def blr_1break(ys, xs):
+    '''
+    vraci funkci co spocita posterior hustotu pro bayes linear regresi
+    s jednim zlomem
+    ys, xs - ys pozorovane hodnoty, xs nezavisle hodnoty
+    b00,b10 - koeficient u zavisle promenne pres respektive za zlomem
+    b0 - y=b00*x+b0
+    sigma - rozpytyl
+    s - zlomn
+    '''
+    prior_b00 = lambda x: uniform(loc=-10, scale=20).pdf(x)
+    prior_b10 = lambda x: uniform(loc=-10, scale=20).pdf(x)
+    prior_b0 = lambda x: uniform(loc=-10, scale=20).pdf(x)
+    prior_b1 = lambda x: uniform(loc=-10, scale=20).pdf(x)
+    prior_sigma = lambda x: uniform(1, scale=5).pdf(x)
+    prior_switch = lambda x: uniform(1, scale=10).pdf(x)
+    
+    def prob_density(b00, b10, b0, b1, sigma, switch):
+        prob = 0
+        n = len(xs)
+        for i, xi in enumerate(xs):
+            if xi < switch:
+                prob += (ys[i] - (xi*b00+b0))**2
+            else:
+                prob += (ys[i] - (xi*b10+b1))**2
+        prob = (sigma)**(-n/2) * np.exp(-prob/(2*abs(sigma)))
+        return np.product([prob,
+                           prior_b00(b00),
+                           prior_b10(b10),
+                           prior_b0(b0),
+                           prior_b1(b0),
+                           prior_sigma(sigma),
+                           prior_switch(switch)])
+    return prob_density

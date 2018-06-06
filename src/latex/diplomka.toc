@@ -1,0 +1,26 @@
+\babel@toc {slovak}{}
+\babel@toc {czech}{}
+\babel@toc {czech}{}
+\babel@toc {czech}{}
+\babel@toc {english}{}
+\babel@toc {czech}{}
+\contentsline {section}{Seznam obr\'azk\r {u}}{9}{Doc-Start}
+\contentsline {section}{Seznam v\IeC {\'y}pis\IeC {\r u} zdrojov\IeC {\'e}ho k\IeC {\'o}du}{10}{Doc-Start}
+\contentsline {section}{\numberline {1}\IeC {\'U}vod}{11}{section.1}
+\contentsline {section}{\numberline {2}Bayesovsk\IeC {\'a} statistika}{12}{section.2}
+\contentsline {subsection}{\numberline {2.1}Bayesovsk\IeC {\'a} volba modelu}{12}{subsection.2.1}
+\contentsline {section}{\numberline {3}Model}{14}{section.3}
+\contentsline {subsection}{\numberline {3.1}Model bez zlomu}{14}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Model s v\IeC {\'\i }ce zlomy}{15}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Model s v\IeC {\'\i }ce zlomy a r\IeC {\r u}zn\IeC {\'y}m po\IeC {\v c}tem dimenz\IeC {\'\i }}{17}{subsection.3.3}
+\contentsline {section}{\numberline {4}MCMC}{19}{section.4}
+\contentsline {subsection}{\numberline {4.1}Monte Carlo Integrace}{19}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Markovsk\IeC {\'y} \IeC {\v r}et\IeC {\v e}zec}{20}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Metropolis-Hastings}{21}{subsection.4.3}
+\contentsline {section}{\numberline {5}RJMCMC}{24}{section.5}
+\contentsline {subsection}{\numberline {5.1}Algoritmus}{25}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}P\IeC {\v r}\IeC {\'\i }klad}{26}{subsection.5.2}
+\contentsline {section}{\numberline {6}Z\IeC {\'a}v\IeC {\v e}r}{33}{section.6}
+\contentsline {section}{Literatura}{34}{section.6}
+\contentsline {section}{P\IeC {\v r}\IeC {\'\i }lohy}{34}{section.6}
+\contentsline {section}{\numberline {A}Zdrojov\IeC {\'e} k\IeC {\'o}dy}{35}{appendix.A}

@@ -1,0 +1,3 @@
+def load(filename, lines_to_skip):
+    with open filename as f:
+        line = f.readline()

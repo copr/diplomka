@@ -1,0 +1,16 @@
+import theano.tensor as T
+import theano
+import numpy as np
+
+
+class TransformationFactory:
+    def __init__(self):
+        print("init")
+
+    def create_transformation(self, n):
+        x = T.vector('x')
+        f_list = []
+        for i in range(n):
+            f_list.append(x[i] + 1)
+        f = T.as_tensor_variable(f_list)
+        return theano.function([x], f)

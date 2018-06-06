@@ -1,0 +1,58 @@
+from numpy.random import uniform
+
+class Model:
+    '''
+    Model by mel byt schopen udelat jeden krok v ramci rjmcmc cyklu
+
+    tedy je potreba
+    navrhova distribuce - typu ProposalDistribution
+    stacionarni distribuce - s metodou pdf
+    
+    mozne
+    transformace nahoru - typu transformace
+    model up - typu model
+    transformace dollu - typu transformace
+    model down - typu model
+    
+
+    metody
+    step(previous_sample) - vrati novy vzorek v zavislosti na predchozim
+    '''
+
+    def __init__(self,
+                 name,
+                 proposal_distribution,
+                 stationary_distribution,
+                 transform_up,
+                 model_up,
+                 transform_down,
+                 model_down):
+        self.name = name
+        self.proposal_distribution = proposal_distribution
+        self.stationary_distribution = stationary_distribution
+        self.transform_up = transform_up
+        self.transform_down = transform_down
+        self.model_up = model_up
+        self.model_down = model_down
+
+        self.n_options = 1
+        if model_up is not None:
+            self.n_options += 1
+        if model_down is not None:
+            self.n_options += 1
+
+    def set_model_up(self, model):
+        self.n_options += 1
+        self.model_up = model
+
+    def set_model_down(self, model):
+        self.n_options += 1
+        self.model_down = model
+            
+    def step(self, previous_sample):
+        # tady se uz potrebuju podivat jak se to dela v rjmcmc
+        # myslenka je, ze vyberu jednu z moznosti a potom ji
+        # zkusim vykonat, pak vratim novy sample a model, ktery se pouzil
+        # e.g. kdybych udelal transformaci nahoru tak vracim s novym samplem
+        # i "horni model"
+        u = uniform()

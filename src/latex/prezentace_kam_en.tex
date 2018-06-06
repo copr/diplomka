@@ -1,0 +1,119 @@
+% Encoding: cp1250
+% Format: LaTeX-Beamer
+% Lukas Pospisil, Petr Kovar
+% Last update: 29.01.2012
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{beamer}
+
+% Packages to use
+\usepackage[cp1250]{inputenc} % Windows
+%\usepackage[utf8]{inputenc} % Unix/Linux
+%\usepackage[czech]{babel}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{color}
+
+% Use the KAM theme in beamerthemeKAM.sty
+%\usetheme{KAMcz}
+\usetheme{KAMen}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Makra
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Titlepage
+
+\author{Nick Carter, Lukáš Pospíšil, Petr Kováø} % author
+%\title{Šablona prezentací KAM pro Beamer} % name of the presentation
+\title{The KAM theme} % name of the presentation
+%\subtitle{(prezentace snadno a rychle)} % suttitle of the name
+\subtitle{for everybody and everyone} % suttitle of the name
+%\date{\today} % date
+\date{29.1.2012} % date
+%\institute{Katedra aplikované matematiky, VŠB -- TU Ostrava} % instituce CZ
+\institute{Department of Applied Mathematics, \\ V\v{S}B -- Technical University of Ostrava} % instituce EN
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Presentation begins
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title frame
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Outline of the talk}
+  \begin{itemize}
+    \item Motivation
+    \item Theorem
+    \item Logos
+  \end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Motivation}
+The preparation of a presentation is fast and easy\dots
+
+Just edit this file!
+
+\pause
+\medskip
+For a comprehensive manual of Beamer see~\cite{bib:Beamer}.
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\begin{theorem}[Nick Carter 1900]
+Let $A$ by a matrix.
+Then $A^{T}$ is also a matrix.
+\end{theorem}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+
+Here {\tt <http://am.vsb.cz/intro\_folder.php>} you can find KAM logos in *.png and *.eps formats.
+
+\pause
+\medskip
+For a specific resolution convert the *.eps file.
+
+\bigskip
+% Figure
+\centerline{
+\includegraphics{Pictures/VSB_logo_KAM_3D.png}%
+}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\begin{center}
+%\textbf{Dìkujeme za pozornost} % Thanks CZ
+\textbf{Thank you for attention} % Thanks EN
+\end{center}
+\begin{thebibliography}{9}
+
+\bibitem{bib:Beamer}
+T.~Tantau, J.~Wright, V.~Mileti\'{c}: \emph{The beamer class} [on-line], last revision September 21, 2011 [cit. 2012-01-29].
+$<$http://www.ctan.org/tex-archive/macros/latex/contrib/beamer/doc/beameruserguide.pdf$>$.
+\end{thebibliography}
+\end{frame}
+
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% end of file "prezentace_kam_en.tex"

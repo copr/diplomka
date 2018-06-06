@@ -1,0 +1,118 @@
+import sys
+
+import theano
+import scipy.stats
+
+import theano.tensor as T
+
+import numpy as np
+
+
+from numpy.random import uniform
+from mcmc_innard import mcmc_step
+
+
+def rjmcmc(stationaries, proposals, proposal_samplers,
+           transformations, transformations_jacobians, first_sample, n):
+    samples = []
+    samples.append(first_sample)
+    filler = scipy.stats.uniform(0, 4)
+    for i in range(1, n):
+        previous_sample = samples[i-1]
+        model = int(previous_sample[0])
+        actual_previous_sample = previous_sample[1:]
+        u = uniform()
+        if u < 0.5:
+            newsample = mcmc_step(actual_previous_sample,
+                                  stationaries[model],
+                                  proposals[model],
+                                  proposal_samplers[model])
+
+            if model == 1 and (newsample[1] > 10 or newsample[3] > 10):
+                print(newsample)
+                raise Exception("not in prior")
+                            
+            newsample = np.append([model], newsample)
+            
+            elif model == 0:
+                stat1 = stationaries[0]
+                stat2 = stationaries[1]
+                us = filler.rvs(2)
+            
+                sample_to_transform = np.append(actual_previous_sample, [us])
+            
+                prop_sample = transformations[model](sample_to_transform)
+            
+                gm = np.prod(filler.pdf(us))
+
+            
+                # print(prop_sample)
+                # print(transformations_jacobians[model](prop_sample))
+
+            
+                jakobian = np.linalg.det(
+                    transformations_jacobians[model](sample_to_transform))
+
+                assert(len(actual_previous_sample) == 2)
+                down = stat1(actual_previous_sample)*gm
+
+                assert(len(prop_sample) == 4)
+                up = stat2(prop_sample)*jakobian
+
+                u = uniform()
+                if u < up/down:
+                    newsample = np.append([1], [prop_sample])
+                else:
+                    newsample = previous_sample
+        else:
+            prop_sample = transformations[model](actual_previous_sample)
+
+            assert(len(prop_sample[:2]) == 2)
+            stat1_value = stationaries[0](prop_sample[:2])
+
+            assert(len(actual_previous_sample) == 4)
+            stat2_value = stationaries[1](actual_previous_sample)
+
+            gm = np.prod(filler.pdf(actual_previous_sample[2:]))
+
+            jakobian = np.linalg.det(
+                transformations_jacobians[model](prop_sample))
+
+            gm = np.prod(filler.pdf(prop_sample[2:]))
+
+            up = stat1_value*jakobian*gm
+            down = stat2_value
+
+            u = uniform()
+            if u < up/down:
+                newsample = np.append([0], [prop_sample[:2]])
+            else:
+                newsample = previous_sample
+
+        samples.append(newsample)
+
+        # progress bar
+        sys.stdout.write("\r\t%.0f%% Done" % (100*i/n))
+        sys.stdout.flush()
+
+    sys.stdout.write("\r\t100% Done\n")
+    sys.stdout.flush()
+
+    return samples
+
+
+
+
+
+
+# In [126]: dy = x[0]+x[1]+x[2]**2
+
+# In [127]: dz = x[0]-x[1]**3*x[2]
+
+# In [128]: o = T.as_tensor_variable([dx, dy, dz])
+
+# In [129]: f = theano.function([x], o)
+
+# In [130]: f([1,2,3])
+# Out[130]: array([ 28.,  12., -23.])
+

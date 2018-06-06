@@ -1,0 +1,36 @@
+\begin{thebibliography}{1}
+
+\bibitem{numpy}
+Numpy.
+\newblock http://www.numpy.org/.
+
+\bibitem{python}
+Python.
+\newblock https://www.python.org/.
+
+\bibitem{theano}
+Theano.
+\newblock http://deeplearning.net/software/theano/.
+
+\bibitem{andrieu2003introduction}
+Christophe Andrieu, Nando De~Freitas, Arnaud Doucet, and Michael~I Jordan.
+\newblock An introduction to mcmc for machine learning.
+\newblock {\em Machine learning}, 50(1-2):5--43, 2003.
+
+\bibitem{green2009reversible}
+Peter~J Green and David~I Hastie.
+\newblock Reversible jump mcmc.
+\newblock {\em Genetics}, 155(3):1391--1403, 2009.
+
+\bibitem{robert2007bayesian}
+Christian Robert.
+\newblock {\em The Bayesian choice: from decision-theoretic foundations to
+  computational implementation}.
+\newblock Springer Science \& Business Media, 2007.
+
+\bibitem{robert2004monte}
+Christian~P Robert.
+\newblock {\em Monte carlo methods}.
+\newblock Wiley Online Library, 2004.
+
+\end{thebibliography}

@@ -1,0 +1,3 @@
+class ProposalDistribution:
+    def __init__(pdf, rvs):
+        

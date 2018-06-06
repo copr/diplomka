@@ -1,0 +1,54 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+from scipy.stats import multivariate_normal as normal
+
+import utils
+
+from blr2 import Blr2
+from proposalDistribution import ProposalDistribution
+from mcmc import Mcmc
+
+#np.seterr(all='raise')
+
+xs = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+ys = np.array([0, 0, 0, 0, 0, 2, 4, 6, 8, 10, 12]) \
+     + np.random.normal(0, 0.5, 11)
+
+blr = Blr2(xs, ys, 0)
+
+n1 = normal(np.zeros(blr.n), 3*np.eye(blr.n))
+
+
+def rvs(theta):
+    n1.mean = theta
+    k = n1.rvs()
+    k[0] = np.abs(k[0])
+    return k
+
+
+n2 = normal(np.zeros(blr.n), 3*np.eye(blr.n))
+
+
+def pdf(x, y):
+    n2.mean = x
+    return n2.pdf(y)
+
+
+prop = ProposalDistribution(pdf, rvs)
+
+mcmc = Mcmc(prop, blr)
+
+
+first_sample = blr.generate_first_sample()
+
+samples = mcmc.sample(10000, first_sample)
+
+utils.plot(xs, ys, samples, blr.n)
+ss, hs, sigmas = utils.individual_samples(samples, blr.n)
+
+smeans = np.mean(ss, 1)
+hmeans = np.mean(hs, 1)
+
+
+

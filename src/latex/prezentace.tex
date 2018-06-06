@@ -1,0 +1,35 @@
+\documentclass{beamer}
+
+\usepackage[czech]{babel}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{float} 
+\usepackage{pgfplots} 
+\usepackage{amsfonts}
+
+
+\graphicspath{ {images/} }
+\usetheme{Madrid}
+
+
+\title{Po částech lineární regrese}
+\author[Martin Koběrský]{Martin Koběrský}
+
+\begin{document}
+	
+	\frame{\titlepage}
+	\begin{frame}
+	\frametitle{Násobení polynomů}
+	\begin{align*}
+	p(x) = \sum_{i=0}^{n-1}a_ix^{i}
+	\end{align*}
+	Součin polynomů můžeme získat takto
+	\begin{align*}
+	p(x)q(x) = a_0b_0 + (a_0b_1 + a_1b_0)x + (a_0b_2 + a_1b_1 + a_2b_0)x^2 + ... +\\ a_{n-1}b_{n-1}x^{2n-2}.
+	\end{align*}
+	Stupeň takového polynomu je $n-1$. \\
+	Problém s tímto přístupem je, že časová složitost je $O(n^2)$.
+\end{frame}
+
+\end{document}

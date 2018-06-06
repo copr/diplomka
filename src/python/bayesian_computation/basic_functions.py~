@@ -1,0 +1,12 @@
+import numpy as np
+
+def sd_pooled(xs, ys):
+    sx = np.std(xs)
+    sy = np.std(ys)
+    m = xs.size
+    n = ys.size
+
+def ttest(xs, ys):
+    xmean = np.mean(xs)
+    ymean = np.mean(ys)
+    

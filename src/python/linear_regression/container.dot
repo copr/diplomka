@@ -1,0 +1,19 @@
+digraph G {
+b00;
+b01;
+y [style=filled];
+pred [shape=invtriangle];
+pred -> y  [label=mu];
+b00 -> pred  [label=b00];
+switch;
+switch -> pred  [label=s];
+weight [style=filled];
+weight -> pred  [label=x];
+b10;
+b10 -> pred  [label=b10];
+b11;
+b11 -> pred  [label=b11];
+b01 -> pred  [label=b01];
+err;
+err -> y  [label=tau];
+}

@@ -1,0 +1,22 @@
+\babel@toc {slovak}{}
+\babel@toc {czech}{}
+\babel@toc {czech}{}
+\babel@toc {czech}{}
+\babel@toc {english}{}
+\babel@toc {czech}{}
+\contentsline {section}{Seznam pou\IeC {\v z}it\IeC {\'y}ch zkratek a symbol\IeC {\r u}}{15}{Doc-Start}
+\contentsline {section}{Seznam obr\'azk\r {u}}{17}{Doc-Start}
+\contentsline {section}{Seznam tabulek}{19}{Doc-Start}
+\contentsline {section}{Seznam v\IeC {\'y}pis\IeC {\r u} zdrojov\IeC {\'e}ho k\IeC {\'o}du}{21}{Doc-Start}
+\contentsline {section}{\numberline {1}\IeC {\'U}vod}{23}{section.1}
+\contentsline {section}{\numberline {2}Anal\IeC {\'y}za probl\IeC {\'e}mu}{25}{section.2}
+\contentsline {subsection}{\numberline {2.1}D\IeC {\r u}le\IeC {\v z}it\IeC {\'\i } sezonn\IeC {\'\i } za \IeC {\'u}sp\IeC {\v e}ch}{26}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Bojovat v\IeC {\'y}hodu z\IeC {\'a}\IeC {\v r}iv\IeC {\v e} i Nobel}{27}{subsection.2.2}
+\contentsline {subsubsection}{\numberline {2.2.1}Hovoru s\IeC {\'a}gy d\IeC {\'a} nebyly}{29}{subsubsection.2.2.1}
+\contentsline {section}{\numberline {3}Pravideln\IeC {\'y}mi ovce dosavadn\IeC {\'\i }}{31}{section.3}
+\contentsline {subsection}{\numberline {3.1}T\IeC {\'y}mem nenavrt\IeC {\'a}vat vkusn\IeC {\'e} uhersk\IeC {\'e}}{31}{subsection.3.1}
+\contentsline {section}{\numberline {4}Z\IeC {\'a}v\IeC {\v e}r}{33}{section.4}
+\contentsline {section}{Literatura}{35}{section.4}
+\contentsline {section}{P\IeC {\v r}\IeC {\'\i }lohy}{35}{section.4}
+\contentsline {section}{\numberline {A}Pln\IeC {\'e} tkv\IeC {\'\i } drah pokles pr\IeC {\r u}b\IeC {\v e}hu}{37}{appendix.A}
+\contentsline {section}{\numberline {B}Pouze obr\IeC {\'a}zek}{39}{appendix.B}

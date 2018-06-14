@@ -84,28 +84,42 @@ Statistické problémy, kde jedna z věcí, kterou hledáme je počet parametrů
 Druhou zmiňovanou úlohou se budeme zabývat my v této práci. Stručně jde o to najít po částech lineární spojitou funkcí, která co nejlépe vysvětluje zadané data. K namodelování problému využijeme Bayesovskou statistiku, pomocí které dokážeme poměrně elegantně popsat daný model. Její hlavní výhodou při řešení tohoto problému je to, že přirozeně znevýhodňuje modely s vyšší dimenzí \cite{robert2007bayesian}, které ale nevysvětlují data o mnoho líp než jednodušší modely. V rámci Bayesovské statistiky tedy sestavíme aposteriorní rozdělení na parametrech modelu podmíněně závislé na datech. Pomocí něhož můžeme učinit závěry o daných parametrech. \par
 Protože toto rozdělení je příliš složité na to, abychom s ním mohli pracovat analyticky, budeme se muset uchýlit k aproximaci. Pro tento účel se většinou používají algoritmy Markov Chain Monte Carlo, které ale nestačí na úkoly, kde počet neznámých je jeden z parametrů modelu.  Proto využijeme algoritmus Reversible Jump Markov Chain Monte Carlo, který zobecňuje algoritmy MCMC i pro modely s proměnnou dimenzí.
 \section{Bayesovská statistika}
-Ve statistice jsou nejrozšířenější dva přístupy a to frekventistický a Bayesovký. Rozdíl mezi nimi je v tom, jak se staví k parametrům daného statistické modelu. Ve statistice frekventistické považujeme tyto parametry za nějaké konkrétní, ale neznáme hodnoty. Zatímco ve statistice Bayesovské považujeme tyto parametry za náhodné veličiny, které mají pravděpodobnostní rozdělení, jemuž říkáme apriorní \cite{robert2007bayesian}. Pomocí apriorního rozdělení můžeme do modelu zanést naši předchozí zkušenost nebo informaci, která není obsažena v samotných pozorováních. Toto rozdělení budeme značit 
-\begin{align}
-f(\theta), \theta \in \mathcal{R}^m.
-\end{align}\par
-Dalším předpoklad je, že daná pozorování jsou z parametrizovaného pravděpodobnostního rozdělení s hustotou pravděpodobnosti 
-\begin{align}
-f(x | \theta),
-\end{align}
-kde $x$ je vektor pozorování $(x_0, x_1, ..., x_n)$ a $\theta$ je vektor parametrů $(\theta_0, \theta_1, ... \theta_m)$. \par
-Nyní můžeme pomocí Bayesovy věty odvodit podmíněné pravděpodobnostní rozdělení parametru $\theta$ 
+Ve statistice jsou nejrozšířenější dva přístupy a to frekventistický a Bayesovký. Rozdíl mezi nimi je v tom, jak se staví k parametrům daného statistického modelu. Ve statistice frekventistické považujeme tyto parametry za nějaké konkrétní, ale neznáme hodnoty. Zatímco ve statistice Bayesovské považujeme tyto parametry za náhodné veličiny. Rozdělení těchto náhodných veličin nazýváme apriorní \cite{robert2007bayesian}. Pomocí apriorního rozdělení můžeme do modelu zanést naši předchozí zkušenost nebo informaci, která není obsažena v samotných pozorováních. Nyní zadefinujeme náhodné veličiny a jejich pravděpodobnostní hustoty:
+\begin{itemize}
+	\item $X$ ... data
+	\item $\Theta$ ... neznámý parametr
+	\item $f_{\Theta}(\theta)$ ... apriorní rozdělení parametru $\Theta$ 
+	\item $f_{X|\Theta}(x|\theta)$ ... model - z bayesovského pohledu podmíněná hustota
+\end{itemize}
+$X$ je vektor pozorování $( X_1, ..., X_n)$ a $\Theta$ je vektor parametrů $(\Theta_1, ... \Theta_m)$. \par
+Nyní můžeme pomocí Bayesovy věty odvodit podmíněnou pravděpodobnostní hustotu parametru $\theta$ 
 \begin{align} \label{bayes}
-f(\theta | x) = \frac{f(x|\theta)f(\theta)}{f(x)},
+f(\theta | x)_{\Theta|X} = \frac{f_{X|\Theta}(x|\theta)f_{\Theta}(\theta)}{f(x)},
 \end{align}
-toto rozdělení nazýváme aposteriorní a shrnuje veškerou informaci o parametru $\theta$, která je nám známa. $f(x)$ lze chápat jako normalizační konstantu, která nezávisí na $\theta$ a je možné ji získat vyintegrováním čitatele v \ref{bayes}  přes $\theta$
+toto rozdělení nazýváme aposteriorní a shrnuje veškerou informaci o parametru $\theta$, která je nám známa, tj. apriorní informace a informace z dat. $f(x)$ v \eqref{bayes} je marginální hustota ze sdružené hustoty $f_{X|\Theta}(x|\theta)f_{\Theta}(\theta)$, tudíž ji lze chápat jako normalizační konstantu, která nezávisí na $\theta$ a je možné ji získat vyintegrováním čitatele v \eqref{bayes}  přes $\theta$
 \begin{align}
-f(x) = \int f(x|\theta)f(\theta) d\theta.
+f(x) = \int_{\Theta} f(x|\theta)f(\theta) d\theta.
+\end{align}
+V dalším textu, pokud bude význam zřejmý z kontextu
+\begin{itemize}
+	\item nebudeme rozlišovat náhodné veličiny a jejich hodnoty, 
+	\item funkce nebudeme rozlišovat indexy, ale jen argumenty,
+	\item všechny integrály budeme uvažovat určité pro obor hodnot.
+\end{itemize}
+\subsection{Bayesovská volba modelu}
+V předchozí části jsme se zabývali situací s jedním konkrétním modelem, nyní se zabývejme obecnější situací, kdy máme množinu více modelů. Předpokládejme tedy, že máme $K$ modelů a náhodnou veličinu $M$, která nabývá hodnot $\{1, ..., K\}$, tato náhodná veličina určuje model. Pro každý z nich předpokládáme, že data mají pravděpodobnostní hustotu $f(x |m,  \theta_m)$, kde $\theta_k$ určuje parametry modelu $m$. Množina parametrů modelu $f(x |m,  \theta_m)$ je:
+\begin{align}
+\boldsymbol{\Theta} = \bigcup_{m=1}^{K} {m} \times \Theta_m, kde \Theta_m \subset \mathcal{R}^{D_m} je množina hodnot parametrů modelu m.
 \end{align}
 
-\subsection{Bayesovská volba modelu}
-Nyní předpokládejme, že máme množinu $K$ modelů $M = \{M_1, ..., M_K\}$. Pro každý z nich předpokládáme, že data mají pravděpodobnostní rozdělení $f(x | \theta_k, M_k)$, kde $\theta_k$ určuje parametry modelu $M_k$. Nyní bychom chtěli rozhodnout, z kterého modelu pocházejí data nebo jinak který model nejlíp vysvětluje data. Z Bayesovkého pohledu budeme tedy chtít odvodit aposteriorní rozdělení na modelu, proto potřebujeme apriorní rozdělení $f(\theta_k, M_k)$, které můžeme přirozeně faktorizovat jako 
+Apriorní rozdělení budeme volit takto:
 \begin{align}
-f(\theta_k, M_k) = f(\theta_k | M_k)f(M_k).
+f(m, \theta) =   f(m)\prod_{\tilde{m}}f_{\Theta_m|M}(\theta_{\tilde{m}}| M=\tilde{m}) = f(m)f(\theta_m | m)
+\end{align}
+tj. předpokládáme podmíněnou nezávislost na parametrech $\theta_1, ... \theta_{m-1}, \theta_{m+1}, \theta_{K}$ za podmínky $M=m$.
+Pro model bude obdobně platit
+\begin{align}
+f(x | m, \theta) = f(x | m, \theta_m).
 \end{align}
 Aposteriorní rozdělení tedy bude vypadat následovně:
 \begin{align}

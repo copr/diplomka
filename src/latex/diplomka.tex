@@ -59,7 +59,7 @@
 
 \EnglishThesisTitle{Segmented Regression}
 
-\SubmissionDate{30. dubna 2018}
+\SubmissionDate{13. července 2018}
 
 % Pokud nechceme nikomu dekovat makro zapoznamkujeme.
 \Thanks{Rád bych poděkoval panu Kracíkovi za shovívavost a trpělivost a svojí mamince za zkontrolování gramtických chyb. Pokud i přesto nějaké chyby zůstaly, chyba je jen na mojí straně. Děkuji.}
@@ -82,53 +82,47 @@
 \section{Úvod}
 Statistické problémy, kde jedna z věcí, kterou hledáme je počet parametrů, se často objevují ve statistickém modelování. Objevují se v novějších problémech jako je rozpoznávaní obrazu, ale také při tradičnějších statických úlohách, jako jsou směsi normálních rozdělení a nebo v po částech lineární regresi. \par
 Druhou zmiňovanou úlohou se budeme zabývat my v této práci. Stručně jde o to najít po částech lineární spojitou funkcí, která co nejlépe vysvětluje zadané data. K namodelování problému využijeme Bayesovskou statistiku, pomocí které dokážeme poměrně elegantně popsat daný model. Její hlavní výhodou při řešení tohoto problému je to, že přirozeně znevýhodňuje modely s vyšší dimenzí \cite{robert2007bayesian}, které ale nevysvětlují data o mnoho líp než jednodušší modely. V rámci Bayesovské statistiky tedy sestavíme aposteriorní rozdělení na parametrech modelu podmíněně závislé na datech. Pomocí něhož můžeme učinit závěry o daných parametrech. \par
-Protože toto rozdělení je příliš složité na to, abychom s ním mohli pracovat analyticky, budeme se muset uchýlit k aproximaci. Pro tento účel se většinou používají algoritmy Markov Chain Monte Carlo, které ale nestačí na úkoly, kde počet neznámých je jeden z parametrů modelu.  Proto využijeme algoritmus Reversible Jump Markov Chain Monte Carlo, který zobecňuje algoritmy MCMC i pro modely s proměnnou dimenzí.
+Protože toto rozdělení je příliš složité na to, abychom s ním mohli pracovat analyticky, budeme se muset uchýlit k aproYimaci. Pro tento účel se většinou používají algoritmy Markov Chain Monte Carlo, které ale nestačí na úkoly, kde počet neznámých je jeden z parametrů modelu.  Proto využijeme algoritmus Reversible Jump Markov Chain Monte Carlo, který zobecňuje algoritmy MCMC i pro modely s proměnnou dimenzí.
 \section{Bayesovská statistika}
-Ve statistice jsou nejrozšířenější dva přístupy a to frekventistický a Bayesovký. Rozdíl mezi nimi je v tom, jak se staví k parametrům daného statistického modelu. Ve statistice frekventistické považujeme tyto parametry za nějaké konkrétní, ale neznáme hodnoty. Zatímco ve statistice Bayesovské považujeme tyto parametry za náhodné veličiny. Rozdělení těchto náhodných veličin nazýváme apriorní \cite{robert2007bayesian}. Pomocí apriorního rozdělení můžeme do modelu zanést naši předchozí zkušenost nebo informaci, která není obsažena v samotných pozorováních. Nyní zadefinujeme náhodné veličiny a jejich pravděpodobnostní hustoty:
+Ve statistice jsou nejrozšířenější dva přístupy a to frekventistický a Bayesovký. Rozdíl mezi nimi je v tom, jak se staví k parametrům daného statistického modelu. Ve statistice frekventistické považujeme data za náhodné veličiny, ale parametry daných modelů za nějaké konkrétní, avšak neznáme hodnoty. Zatímco ve statistice Bayesovské považujeme i tyto parametry za náhodné veličiny. Rozdělení těchto náhodných veličin nazýváme apriorní \cite{robert2007bayesian}. Pomocí apriorního rozdělení můžeme do modelu zanést naši předchozí zkušenost nebo informaci, která není obsažena v samotných pozorováních. Nyní zadefinujeme zmíněné náhodné veličiny a jejich pravděpodobnostní hustoty:
 \begin{itemize}
-	\item $X$ ... data
-	\item $\Theta$ ... neznámý parametr
+	\item $Y = ( Y_1, ..., Y_n)$ ... data
+	\item $\Theta = (\Theta_1, ... ,\Theta_p)$ ... neznámý parametr, množinu hodnot $\Theta$ budeme značit $\boldsymbol{\Theta}$
 	\item $f_{\Theta}(\theta)$ ... apriorní rozdělení parametru $\Theta$ 
-	\item $f_{X|\Theta}(x|\theta)$ ... model - z bayesovského pohledu podmíněná hustota
-\end{itemize}
-$X$ je vektor pozorování $( X_1, ..., X_n)$ a $\Theta$ je vektor parametrů $(\Theta_1, ... \Theta_m)$. \par
-Nyní můžeme pomocí Bayesovy věty odvodit podmíněnou pravděpodobnostní hustotu parametru $\theta$ 
+	\item $f_{Y|\Theta}(y|\theta)$ ... parametrický model dat
+\end{itemize}\par
+Na základě $f_{\Theta}(\theta)$ a $f_{Y|\Theta}(y|\theta)$ můžeme pomocí Bayesovy věty odvodit podmíněnou pravděpodobnostní hustotu parametru $\theta$ za podmínky $Y=y$
 \begin{align} \label{bayes}
-f(\theta | x)_{\Theta|X} = \frac{f_{X|\Theta}(x|\theta)f_{\Theta}(\theta)}{f(x)},
+f(\theta | y)_{\Theta|Y} = \frac{f_{Y|\Theta}(y|\theta)f_{\Theta}(\theta)}{f(y)}.
 \end{align}
-toto rozdělení nazýváme aposteriorní a shrnuje veškerou informaci o parametru $\theta$, která je nám známa, tj. apriorní informace a informace z dat. $f(x)$ v \eqref{bayes} je marginální hustota ze sdružené hustoty $f_{X|\Theta}(x|\theta)f_{\Theta}(\theta)$, tudíž ji lze chápat jako normalizační konstantu, která nezávisí na $\theta$ a je možné ji získat vyintegrováním čitatele v \eqref{bayes}  přes $\theta$
+Toto rozdělení nazýváme aposteriorní a shrnuje veškerou informaci o parametru $\theta$, která je nám známa, tj. apriorní informaci a informaci z dat. $f(y)$ v \eqref{bayes} je marginální hustota ze sdružené hustoty $f_{Y|\Theta}(y|\theta)f_{\Theta}(\theta)$, tudíž ji lze chápat jako normalizační konstantu, která nezávisí na $\theta$ a je možné ji získat vyintegrováním čitatele v \eqref{bayes}  přes $\theta$
 \begin{align}
-f(x) = \int_{\Theta} f(x|\theta)f(\theta) d\theta.
-\end{align}
+f(y) = \int_{\boldsymbol{\Theta}} f(y|\theta)f(\theta) d\theta.
+\end{align} \par
 V dalším textu, pokud bude význam zřejmý z kontextu
 \begin{itemize}
-	\item nebudeme rozlišovat náhodné veličiny a jejich hodnoty, 
-	\item funkce nebudeme rozlišovat indexy, ale jen argumenty,
-	\item všechny integrály budeme uvažovat určité pro obor hodnot.
+	\item nebudeme rozlišovat náhodné veličiny a jejich hodnoty,
+	\item u hustot nebudeme uvádět indexy, je-li N.V. určena argumentem, tj. např $f(\theta)$ značí $f_{\Theta}(\theta)$ apod.
+	\item všechny integrály chápeme jako určité přes obor hodnot.
 \end{itemize}
 \subsection{Bayesovská volba modelu}
-V předchozí části jsme se zabývali situací s jedním konkrétním modelem, nyní se zabývejme obecnější situací, kdy máme množinu více modelů. Předpokládejme tedy, že máme $K$ modelů a náhodnou veličinu $M$, která nabývá hodnot $\{1, ..., K\}$, tato náhodná veličina určuje model. Pro každý z nich předpokládáme, že data mají pravděpodobnostní hustotu $f(x |m,  \theta_m)$, kde $\theta_k$ určuje parametry modelu $m$. Množina parametrů modelu $f(x |m,  \theta_m)$ je:
+V předchozí části jsme se zabývali situací s jedním konkrétním modelem, nyní se zabývejme obecnější situací, kdy máme množinu více modelů. Předpokládejme tedy, že máme $K$ modelů a označme $M$ index modelu, která nabývá hodnot $\{1, ..., K\}$. M je tedy dalším parametrem. Pro každý z modelů předpokládáme, že data mají pravděpodobnostní hustotu $f(y |m,  \theta_m)$, kde $\theta_m$ určuje parametry modelu $m$ a toto $\theta_m$ má dimenzi $D_m$, jinými slovy tedy $\theta = (m, \theta_m)$. Množina parametrů modelu $f(y |m,  \theta_m)$ je tedy:
 \begin{align}
-\boldsymbol{\Theta} = \bigcup_{m=1}^{K} {m} \times \Theta_m, kde \Theta_m \subset \mathcal{R}^{D_m} je množina hodnot parametrů modelu m.
+\boldsymbol{\Theta} = \bigcup_{m=1}^{K} \{m\} \times \boldsymbol{\Theta}_m,
 \end{align}
-
-Apriorní rozdělení budeme volit takto:
+ kde $\boldsymbol{\Theta}_m \subset \mathcal{R}^{D_m}$ je množina hodnot parametrů modelu m. \par
+Apriorní rozdělení můžeme přirozeně faktorizovat:
 \begin{align}
-f(m, \theta) =   f(m)\prod_{\tilde{m}}f_{\Theta_m|M}(\theta_{\tilde{m}}| M=\tilde{m}) = f(m)f(\theta_m | m)
+f(m, \theta_m) = f(m)f(\theta_m | m)
 \end{align}
-tj. předpokládáme podmíněnou nezávislost na parametrech $\theta_1, ... \theta_{m-1}, \theta_{m+1}, \theta_{K}$ za podmínky $M=m$.
-Pro model bude obdobně platit
+Aposteriorní rozdělení je opět podmíněná hustota parametru $(m, \theta_m)$ za podmínky $y$:
 \begin{align}
-f(x | m, \theta) = f(x | m, \theta_m).
+f(m, \theta_m | y) = 
+\frac{f(y | m, \theta_m)f(\theta_m | m)f(m)}{\sum_m \int f(y | m, \theta_m)f(\theta_m | m)f(m) d\theta_m}.
 \end{align}
-Aposteriorní rozdělení tedy bude vypadat následovně:
+A vyintegrováním $\theta_m$ dostáváme marginální aposteriorní rozdělení pro model s indexem m:
 \begin{align}
-f(\theta_k, M_k | x) = 
-\frac{f(x | \theta_k, M_k)f(\theta_k | M_k)f(M_k)}{\sum_k \int f(x | \theta_k, M_k)f(\theta_k | M_k)f(M_k) d\theta_k}.
-\end{align}
-A vyintegrováním $\theta_k$ dostáváme pravděpodobnostní rozdělení, které nám udává pravděpodobnost, že data pocházejí z modelu $M_k$:
-\begin{align}
-f(M_k | x) =  \frac{\int f(x | \theta_k, M_k)f(\theta_k | M_k) d\theta_k f(M_k)}{\sum_k \int f(x | \theta_k, M_k)f(\theta_k | M_k)f(M_k) d\theta_k}.
+f(m | y) =  \frac{\int f(y | m, \theta_m)f(\theta_m | m) d\theta_m f(m)}{\sum_m \int f(y | m, \theta_m)f(\theta_m | m)f(m) d\theta_m}.
 \end{align}  
 % Výhodou Bayesovského přístupu je, že nám umožňuje přidat nějaké naše přesvědčení nebo předchozí znalost o parametrech do modelu a tím zpřesnit výsledky.  \par
 %Jak tedy vypadá Bayesovský model? Jedna jeho část je podmíněné pravděpodobnostní rozdělení náhodné veličiny $x$, jež závisí na parametru $\theta$

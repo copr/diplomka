@@ -150,6 +150,9 @@ f(m | y) =  \frac{\int f(y | m, \theta_m)f(\theta_m | m) d\theta_m f(m)}{\sum_m 
 %které znamená, že $f(\theta | x)$ se rovná $f(x|\theta)f(\theta)$ až na konstantu nezávislou na $\theta$.
 %\subsection{Bayesovský faktor}
 \section{Model}
+Teoretický postup, který jsme nastínili v předchozí kapitole, budeme nyní aplikovat na po částech lineární regresi, čili chceme odvodit aposteriorní rozdělení na jejích parametrech. Problém se kterým se setkáváme je, že jedním z parametrů je počet zlomů po částech lineární regrese. Jinak řečeno, jeden parametr určuje počet zbývajících parametrů. Terminologií předchozí kapitoly tedy můžeme říct, že jde o bayesovskou volbu modelu, kde jednotlivé modely jsou regrese s různým počtem zlomů.
+\par \par
+
 Modelem bude po částech lineární regrese, čili
 \begin{align}
 	y_i = f(x_i) + \epsilon_i

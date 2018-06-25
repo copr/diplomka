@@ -150,18 +150,20 @@ f(m | y) =  \frac{\int f(y | m, \theta_m)f(\theta_m | m) d\theta_m f(m)}{\sum_m 
 %které znamená, že $f(\theta | x)$ se rovná $f(x|\theta)f(\theta)$ až na konstantu nezávislou na $\theta$.
 %\subsection{Bayesovský faktor}
 \section{Model}
-Teoretický postup, který jsme nastínili v předchozí kapitole, budeme nyní aplikovat na po částech lineární regresi, čili chceme odvodit aposteriorní rozdělení na jejích parametrech. Problém se kterým se setkáváme je, že jedním z parametrů je počet zlomů po částech lineární regrese. Jinak řečeno, jeden parametr určuje počet zbývajících parametrů. Terminologií předchozí kapitoly tedy můžeme říct, že jde o bayesovskou volbu modelu, kde jednotlivé modely jsou regrese s různým počtem zlomů.
+Teoretický postup, který jsme nastínili v předchozí kapitole, budeme nyní aplikovat na po částech lineární regresi, čili chceme odvodit aposteriorní rozdělení na jejích parametrech. Problém se kterým se setkáváme je, že jedním z parametrů je počet zlomů po částech lineární regrese. Jinak řečeno, jeden parametr určuje počet zbývajících parametrů. Terminologií předchozí kapitoly jde o bayesovskou volbu modelu, kde jednotlivé modely jsou regrese s různým počtem zlomů. Jak jsme si ukázali, pro odvození aposteriorního rozdělení budeme potřebovat zavést parametrická model dat a apriorní rozdělení. Začneme u nejjednoduššího modelu a postupně přejdeme až k tomu nejobecnějšímu.
 \par \par
 
-Modelem bude po částech lineární regrese, čili
-\begin{align}
-	y_i = f(x_i) + \epsilon_i
-\end{align}
-kde $f(x_i)$ je po částech lineární spojitá funkce a $e_i$ jsou nezávislé identicky distribuované náhodné veličiny s rozdělením $\mathcal{N}(0, \sigma^2)$. Pokud bychom věděli, jak intervaly vypadají, tak můžeme použít metodu nejmenších čtverců k tomu, abychom dostali přímku pro každý interval. V našem případě však nevíme nejen to, jak intervaly vypadají, ale ani to kolik jich je. Zatím si tedy ukážeme, jak konkrétně vypadá aposteriorní rozdělení našeho modelu a v dalších kapitolách budeme řešit to, jak toto rozdělení aproximovat. Pro názornost začneme modelem beze zlomu, čili klasickou Bayesovkou lineární regresí a poté se dostaneme k obecnému modelu. 
-%Lineární regrese se používá k vysvětlení souboru dat pomocí přímky, tedy používá se k nalezení parametrů přimky. Je několik přístupů, jimiž lze nálezt paremtry přímky, a to buď metodou nejmenších čtverců, maximum likelihood estimatorem \myworries{spravny preklad} a nebo bayesovsky. My budeme využívat bayesovká přistup a to z toho důvodu, že ostatní přístupy by nám nestačily v případě, kdy nevíme kolik je parametrů v modelu.
+%\subsection{Model bez zlomu}
+
+%Modelem bude po částech lineární regrese, čili
+%\begin{align}
+%	y_i = f(x_i) + \epsilon_i
+%\end{align}
+%kde $f(x_i)$ je po částech lineární spojitá funkce a $e_i$ jsou nezávislé identicky distribuované náhodné veličiny s rozdělením $\mathcal{N}(0, \sigma^2)$. Pokud bychom věděli, jak intervaly vypadají, tak můžeme použít metodu nejmenších čtverců k tomu, abychom dostali přímku pro každý interval. V našem případě však nevíme nejen to, jak intervaly vypadají, ale ani to kolik jich je. Zatím si tedy ukážeme, jak konkrétně vypadá aposteriorní rozdělení našeho modelu a v dalších kapitolách budeme řešit to, jak toto rozdělení aproximovat. Pro názornost začneme modelem beze zlomu, čili klasickou Bayesovkou lineární regresí a poté se dostaneme k obecnému modelu. 
+
 \subsection{Model bez zlomu}
-Jak už bylo řečeno, zde se podíváme na model lineární bayesovské regrese. Určíme aposteriorní rozdělení parametrů bayesovské lineární regrese s konjugovaným apriorním rozdělením. Jen pro připomenutí to, že je apriorní rozdělení konjugované vzhledem k pravděpodobnostnímu rozdělení znamená to, že aposteriorní rozdělení bude mít stejnou formu jako apriorní rozdělení \cite{robert2007bayesian}. \par
-Vycházíme tedy ze standardního pravděpodobnostního modelu lineární regrese: 
+ %Určíme aposteriorní rozdělení parametrů bayesovské lineární regrese s konjugovaným apriorním rozdělením. Pokud je apriorní rozdělení konjugované vzhledem k parametrickému modelu dat znamená to, že aposteriorní rozdělení bude mít stejnou formu jako apriorní rozdělení \cite{robert2007bayesian}. \par
+Pro určení parametrického modelu dat, vycházíme ze standardního pravděpodobnostního modelu lineární regrese: 
 \begin{align}
 	\label{eq:yi}
 	y_i = a + b x_i + \epsilon_i
@@ -171,7 +173,7 @@ kde $a$, $b$ jsou parametry přímky a $y_i$, $x_i$ jsou jednotlivá pozorovaná
 	\epsilon_i \sim \mathcal{N}(0, \sigma^2),
 \end{align*}
 kde $\sigma^2$ je neznáme a $\epsilon_i$ jsou navzájem nezávislé.
-Z tohoto můžeme určit rozděleni pro $y_i$ tím, že vzorec \eqref{eq:yi} vlastně říká $y_i$ se rovná normálně rozdělené náhodné veličině, k jejíž střední hodnotě přičítáme $a + bx_i$ tudíž:
+Z tohoto určíme rozděleni pro $y_i$ tím, že vzorec \eqref{eq:yi} vlastně říká $y_i$ se rovná normálně rozdělené náhodné veličině, k jejíž střední hodnotě přičítáme $a + bx_i$ tudíž:
 \begin{align}\label{yi}
 	y_i \sim \mathcal{N}(a + bx_i, \sigma^2).
 \end{align}
@@ -180,49 +182,49 @@ Je vhodné dodat, že jako vysvětlovaná veličina zde vystupuje $y_i$ a $x_i$ 
 	f(y_i | a, b, \sigma^2) = \mathcal{N}(y_i | a + bx_i, \sigma^2)
 \end{align}
 Použitím $\mathcal{N}(h | a + bx_i, \sigma^2)$ myslíme pravděpodobnostní hustotu normálního rozdělení se střední hodnotou $a + bx_i$ a rozptylem $\sigma^2$. \par
-Takto jsme získali pravděpodobnostní rozdělení $y_i$. Pro doplnění Bayesovského modelu potřebujeme určit apriorní rozdělení.
-Už jsme řekli, že apriorní rozdělení by mělo být konjugované vzhledem k pravděpodobnostnímu rozdělení. Apriorní rozdělení v tomto případě má mít formu
+Takto jsme získali parametrický model dat. Nyní potřebujeme určit apriorní rozdělení.
+V tomto nejjednodušším případě zvolíme konjugované apriorní rozdělení, což znamená, že aposteriorní rozdělení bude vypadat stejně jako apriorní rozdělení \cite{robert2007bayesian}. Apriorní rozdělení můžeme faktorizovat takto:
 \begin{align}
-	f(a, b, \sigma^2) = f(\sigma^2)f(a,b | \sigma^2),
+	f(a, b, \sigma^2) = f(\sigma^2)f(a,b | \sigma^2).
 \end{align}
-kde $f(\sigma^2)$ má inverzní gamma rozdělení a $f(a,b | \sigma^2)$ má normální rozdělení. Parametry volíme nějakým vhodným způsobem, pokud máme nějakou představu o oblasti, kde se parametry přímky mohou nacházet, tak volíme normální distribuci se středem v dané oblasti a s vhodně nastaveným rozptylem, tak ať pokryjeme danou oblast. Pokud nevíme nic, tak volíme normální rozdělení se středem třeba v bodě nula, ale s velkým rozptylem. Obdobně pro rozptyl:
+A aby bylo apriorní rozdělení konjugované víme, že $f(\sigma^2)$ má inverzní gamma rozdělení a $f(a,b | \sigma^2)$ má normální rozdělení:
 \begin{align}
-	\sigma^2 \sim Inv-Gamma(\alpha, \beta) \\
-	a, b | \sigma^2 \sim \mathcal{N}((\mu_1, \mu_2), \sigma^2\Lambda_0^{-1})
+	\sigma^2 \sim Inv-Gamma(\alpha, \beta), \\
+	a, b | \sigma^2 \sim \mathcal{N}((\mu_1, \mu_2), \sigma^2\Lambda_0^{-1}).
 \end{align}
+Parametry jednotlivých rozdělení volíme vhodným způsobem, který je ale závislý na problému. \par
 % naznacit aspon to nasobeni
 % napsat co z toho teda dostaneme 
 % rict ze teda z toho neco analyticky dostanem 
 % mozna ukazat kdy to teda analyticky uz nevyjde
-Vynásobením modelu a apriorního rozdělení dostáváme aposteriorní rozdělení. A protože jsme použili konjugované apriorní rozdělení, tak výsledné aposteriorní rozdělení je takovéto:
+Z Bayesovy věty dostáváme aposteriorní rozdělení. A protože jsme použili konjugované apriorní rozdělení, dostáváme výsledné aposteriorní rozdělení:
 \begin{align}
-	f(a, b, \sigma^2 | y) = f(a, b | \sigma^2, y) f(\sigma^2 | y)
+	f(a, b, \sigma^2 | y) \propto f(y_i | a, b, \sigma^2)f(\sigma^2)f(a,b | \sigma^2)
 \end{align}
-Pokud bychom použili nekonjugované apriorní rozdělení nebude aposteriorní rozdělení v uzavřené formě a tudíž není možné obecně získat analytické řešení, v tomto případě se dají použít MCMC metody, které dokážou aproximovat navzorkováním.
 \subsection{Model s více zlomy}
-Nyní se tedy dostáváme k tomu jak bude vypadat model s více zlomy. V modelu beze zlomů jsme jako parametry použili parametry z rovnice přímky. Pro více zlomů se nám jeví výhodnější model parametrizovat pomocí (samozřejmě) rozptylu, ale místo použití směrnic daných přímek, použijeme několik bodů, které budou určovat souřadnice zlomů po částech lineární funkci.  Počet bodů bude záviset na počtu zlomů, takže pokud budeme mít 1 zlom, použijeme body 3, pokud 2 zlomy, použijeme body 4 atd. Takže parametr vypadá následovně:
+Nyní se tedy dostáváme k tomu jak vypadá model s více zlomy. V modelu beze zlomů jsme jako parametry použili parametry z rovnice přímky. Pro více zlomů se nám jeví výhodnější model parametrizovat pomocí rozptylu, ale místo použití směrnic daných přímek, použijeme několik bodů, které budou určovat souřadnice zlomů po částech lineární funkce.  Počet bodů bude záviset na počtu zlomů, takže pokud budeme mít 1 zlom, použijeme body 3, pokud 2 zlomy, použijeme body 4 atd. Takže parametr vypadá následovně:
 \begin{align}
-\theta_k = (\sigma^2, s_1, h_1, s_2, h_2, ..., s_{k+1} h_{k+1}),
+\theta_m = (\sigma^2, s_1, h_1, s_2, h_2, ..., s_{m+1} h_{m+1}),
 \end{align}
-kde $\sigma^2$ je rozptyl a pro všechna $i$ body $s_i$ určují x-ové souřadnice bodů určujících přímku a $h_i$ určují y-ové souřadnice. $k$ je index modelu a zároveň počet zlomů. Body $(s_1, h_1)$ a $(s_{k+1}, h_{k+1})$ určují první, respektive poslední bod definující funkci.\par
+kde $\sigma^2$ je rozptyl a pro všechna $i$ body $s_i$ určují x-ové souřadnice bodů určujících přímku a $h_i$ určují y-ové souřadnice. $m$ je index modelu a zároveň počet zlomů. Body $(s_1, h_1)$ a $(s_{m+1}, h_{m+1})$ určují první, respektive poslední bod definující funkce.\par
 Pro tento model už nenajdeme konjugované apriorní rozdělení, což má za následek to že, aposteriorní rozdělení už nebude mít uzavřenou formu a my nebudeme schopni analyticky spočítat parametry nového modelu. Ač se toto může na první pohled zdát značně mrzuté nemusíme zoufat, v dalších kapitolách si ukážeme jak tento problém vyřešit. Prozatím se tedy zaměříme na to, jak náš model bude vypadat. Výhodou je, že už se teď nemusíme ohlížet na nějaké značně restriktivní konjugované apriorní rozdělení, ale můžeme si apriorní rozdělení nastavit takřka, jak chceme.\par
 První si zadefinujeme apriorní rozdělení. Začneme u x-ových souřadnic bodů určujících průběh naší po částech lineární spojité funkce. Od těch budeme chtít hlavně to ať zachovají pořadí. V našem modelu je funkce určena postupně několika body, proto nedává smysl, aby druhý bod byl před prvním nebo aby se jinak otáčelo pořadí. To tedy zavedeme takto
 \begin{align}
-f_1(\theta_k) \propto
+f_1(\theta_m) \propto
 	\begin{cases}
-		1, pokud\ s_1 < s_2 < ... < s_{k+1}, \\
+		1, pokud\ s_1 < s_2 < ... < s_{m+1}, \\
 		0, jindy		
 	\end{cases}
 \end{align}
 zde není úplně správné použít 1 pro případ, kdy je zachováno pořadí. Je to proto, že tato konstanta by měla být správně normalizována, tak ať integrál přes aposteriorní rozdělení je roven jedné. Proč nám to nevadí se ukáže v další kapitole. \par
 Apriorní rozdělení na y-ových souřadnicích by mělo být co nejvíc neinformativní, protože předpokládáme, že o těchto souřadnicích nic nevíme. My jsme v tomto případě zvolili normální rozdělení s nějakým velkým rozptylem $ř$ pro všechny $h$:
 \begin{align}
-f_2(\theta_k) = \prod_{i=1}^{k+1} \mathcal{N}(h_i | 0, ř).
+f_2(\theta_m) = \prod_{i=1}^{m+1} \mathcal{N}(h_i | 0, ř).
 \end{align}
 
 Pro rozptyl použijeme normální rozdělení s tím, že rozptyly menší nebo rovné nule mají nulovou pravděpodobnost:
 \begin{align}
-f_3(\theta_k) = 
+f_3(\theta_m) = 
 \begin{cases}
 \mathcal{N}(\sigma^2 | 0, 3), pokud\  \sigma^2 > 0, \\
 0, jindy
@@ -230,43 +232,43 @@ f_3(\theta_k) =
 \end{align}
 Celé apriorní rozdělení je tedy jen pro úplnost:
 \begin{align}
-f(\theta_k) = f_1(\theta_k)f_2(\theta_k)f_3(\theta_k).
+f(\theta_m) = f_1(\theta_m)f_2(\theta_m)f_3(\theta_m).
 \end{align} \par
-Pravděpodobnostní rozdělení bude podobné jako v modelu bez zlomů. Rozdíl je, že zde je přímka rozdělena na obecně $k$ částí, takže je třeba se vzít v potaz to kde leží bod pro který počítáme pravděpodobnost. Nejdříve si zavedu pomocnou funkci, která nám udá pravděpodobnost pro jeden bod, přes jeden interval. Tu potom využiji v obecnější funkci, která už jde přes všechny možné intervaly. Takže nějak takto:
+Pravděpodobnostní rozdělení bude podobné jako v modelu bez zlomů. Rozdíl je, že zde je přímka rozdělena na obecně $m$ částí, takže je třeba se vzít v potaz to kde leží bod pro který počítáme pravděpodobnost. Nejdříve si zavedu pomocnou funkci, která nám udá pravděpodobnost pro jeden bod, přes jeden interval. Tu potom využiji v obecnější funkci, která už jde přes všechny možné intervaly. Takže nějak takto:
 \begin{align}
 \hat{f}(y_i | \sigma^2, s_1, h_1, s_2, h_2) = \mathcal{N}(y - [(x - s_1)\frac{h_2 - h_1}{s_2 - s_1} + h_1], \sigma^2), \\
-f(y | \theta_k) = \sum_{i=0}^{k} I(s_j < X_i < s_{j+1}) 
+f(y | \theta_m) = \sum_{i=0}^{m} I(s_j < X_i < s_{j+1}) 
 \hat{f}(y_i | s_j, h_j, s_{j+1}, h_{j+1}).
 \end{align}
 Nyní máme pravděpodobnostní rozdělení a apriorní rozdělení, takže jejich vynásobením a průchodem přes všechny vzorky získáváme aposteriorní rozdělení až na multiplikativní konstantu
 \begin{align}
-f(\theta_k | y) \propto \prod_{i=0}^{n} f(y_i | \theta_k) f(\theta_k).
+f(\theta_m | y) \propto \prod_{i=0}^{n} f(y_i | \theta_m) f(\theta_m).
 \end{align}
 \subsection{Model s více zlomy a různým počtem dimenzí}
 V předešlé sekci jsme popsali model s nějakým počtem zlomů. V naší úloze, ale nakonec chceme najít, který z takovýchto modelů je pro naše data nejlepší. Proto nakonec potřebujeme ještě obecnější model a to takový, který dokáže shrnout modely s různým počtem zlomů. Parametr bude v takovém modelu vypadat následovně 
 \begin{align}
-\theta = \bigcup_{k=0}^q({k} \times \theta_k),
+\theta = \bigcup_{m=0}^q\{m\} \times \theta_m,
 \end{align}
-kde $q \in \mathcal{N}$ a omezuje mezi kolika modely můžeme vybírat. Je to technické omezení, tak ať nemusíme pracovat s parametrem nekonečné dimenze. Nyní si zadefinujeme aposteriorní rozdělení, tedy:
+kde $q \in \mathcal{N}$ a omezuje mezi kolika modely můžeme vybírat. Je to technické omezení, tak ať nemusíme pracovat s parametrem nekonečné dimenze. Nyní si zadefinujeme apriorní rozdělení, tedy:
 \begin{align}
-f(k, \theta) = f(\theta | k)f(k).
+f(m, \theta_m) = f(\theta_m | m)f(m).
 \end{align}
-Pro $k$ volíme takové rozdělení, které favorizuje jednodušší modely oproti složitějším v našem případě volíme geometrické rozdělení s parametrem 0.2:
+Pro $m$ volíme takové rozdělení, které zvýhodňuje jednodušší modely oproti složitějším v našem případě volíme geometrické rozdělení s parametrem 0.2:
 \begin{align}
-k \sim G(0.2).
+m \sim G(0.2).
 \end{align}
-A pro podmíněné rozdělení $\theta$ za $k$ využijeme, apriorní rozdělení, které jsme zavedli v minulé kapitole:
+A pro podmíněné rozdělení $\theta$ za $m$ využijeme, apriorní rozdělení, které jsme zavedli v minulé kapitole:
 \begin{align}
-f(\theta | k) = \sum_{l=0}^q \delta_{l, k} f(\theta_l),
+f(\theta_m | m) = \sum_{l=0}^q \delta_{l, m} f(\theta_l),
 \end{align}
 čímž myslíme, že počítáme jen s apriorním rozdělením modelu v kterém se právě nacházíme. \par 
 Pro pravděpodobnostní rozdělení opět využijeme rozdělení, které jsme si zadefinovali v předcházející kapitole:
 \begin{align}
-f(y | k, \theta) = \sum_{l=0}^q \delta_{l,k} f(y | \theta_l).
+f(y | m, \theta_m) = \sum_{l=0}^q \delta_{l,m} f(y | \theta_l).
 \end{align}
 Jako aposteriorní rozdělení tedy máme:
 \begin{align}\label{supermodel}
-	f(k, \theta | y) = f(y | k, \theta)f(k, \theta).
+	f(m, \theta_m | y) = f(y | m, \theta_m)f(m, \theta_m).
 \end{align}
 \section{MCMC}
 Aposteriorní distribuce mají často takový tvar, že je jakýkoli analytický výpočet nemožný. V takový moment se buď musíme spokojit s jednodušším modelem, jehož aposteriorní distribuce umožňuje analytický výpočet a nebo se musíme uchýlit k numerickým aproximacím dané distribuce. MCMC je skupina algoritmů, která dokáže vzorkovat z dané distribuce. Ze získaných vzorků potom můžeme zjistit například bayesovký interval spolehlivosti jen tím, že si ze vzorků spočítáme kvantily o které máme zájem. Dále se získané vzorky dají využít pro Monte Carlo integraci nebo různé optimalizační problémy. \par

@@ -11,17 +11,17 @@ class Rjmcmc:
     monte carlo algoritmus
     '''
 
-    def __init__(self, moves, mcmcs, stationary):
-        self.moves = moves
-        self.mcmcs = mcmcs
-        self.stationary = stationary
+    def __init__(self, move_factory, mcmc_factory, stationary_factory):
+        self.move_factory = move_factory
+        self.mcmc_factory = mcmc_factory
+        self.stationary_factory = stationary_factory
         self.trans_steps = 0
         self.norm_steps = 0
 
     def step(self, previous_sample):
         k, theta = previous_sample
         u = uniform()
-        moves = [m for m in self.moves if m.can_move(k) > 0]
+        moves = [m for m in self.move_factory.get_moves_from(k) if m.can_move(k) > 0]
         trans_probability = 0
         for m in moves:
             trans_probability += m.probability_of_this_move(previous_sample)
@@ -40,23 +40,26 @@ class Rjmcmc:
             return new
         else:
             self.norm_steps += 1
-            if k*2 + 3 is not len(theta):
+            if (k+1)*2 + 3 is not len(theta):
                 print(k)
                 print(previous_sample)
-                raise AssertionError
-            return (k, self.mcmcs[k].step(theta))
+                raise Exception("wrong length")
+            return (k, self.mcmc_factory.get_mcmc(k).step(theta))
 
     def trans_step(self, move, previous_sample):
         (k, theta) = previous_sample
 
         new_sample, u, newu, det_jacobian = move.transform(previous_sample)
 
-        up = np.prod([self.stationary(new_sample),
-                      move.probability_of_this_move(new_sample),
-                      move.probability_of_help_rvs(new_sample, newu)])
-        down = np.prod([self.stationary(previous_sample),
-                        move.probability_of_this_move(previous_sample),
-                        move.probability_of_help_rvs(previous_sample, u)])
+        (new_k, new_theta) = new_sample
+        up = np.prod([
+            self.stationary_factory.get_stationary(new_k).pdf(new_theta),
+            move.probability_of_this_move(new_sample),
+            move.probability_of_help_rvs(new_sample, newu)])
+        down = np.prod([
+            self.stationary_factory.get_stationary(k).pdf(theta),
+            move.probability_of_this_move(previous_sample),
+            move.probability_of_help_rvs(previous_sample, u)])
 
         a = det_jacobian*up/down
         u = uniform()

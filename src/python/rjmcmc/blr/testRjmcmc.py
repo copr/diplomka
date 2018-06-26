@@ -12,8 +12,7 @@ from mcmc import Mcmc
 from mcmc_kth import Mcmc_kth
 from blr2 import Blr2 as Blr
 from proposalDistribution import ProposalDistribution
-
-from transformations import hh, h_jacobian, gg, g_jacobian, ee, dd, e_jacobian, d_jacobian
+from blrMoveFactory import BlrMoveFactory
 
 #xs = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 # ys = np.array([0, 0, 0, 0, 0, 1, 2, 3, 3, 4, 4]) + np.random.normal(0, 1, 11)
@@ -138,32 +137,6 @@ def stationary(x):
         print(k)
         raise Exception("jebatz")
 
-u = uniform(0, 1)
-n3 = normal(0, 1)
-
-uus_generated = []
-
-
-def rvs_generator():
-    uu = [u.rvs(), n3.rvs()]
-    uus_generated.append(uu)
-    return uu
-
-
-def pdf_generator(x):
-    return u.pdf(x[0])*n3.pdf(x[1])
-
-
-generator = ProposalDistribution(pdf_generator, rvs_generator)
-
-move1 = Move(1, 2, 0.05, 0.05, hh, gg,
-             h_jacobian, g_jacobian,
-             generator, None, 2, 0)
-
-move2 = Move(2, 3, 0.05, 0.05, ee, dd,
-             e_jacobian, d_jacobian,
-             generator, None, 2, 0)
-
 rjmcmc = Rjmcmc([move1, move2], mcmcs, stationary)
 
 samples = rjmcmc.sample(20000, (1, first_sample))
@@ -197,4 +170,3 @@ h2means = np.mean(hs2, 1)
 print(n1, n2, n3)
 utils.plot_lines(xs, ys, model3_samples, blr2.n, 50, 0.1, origy)
 utils.plot_hists(xs, ys, model3_samples, blr2.n, 50, 0.1, origy)
-

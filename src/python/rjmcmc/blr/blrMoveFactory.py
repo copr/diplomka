@@ -18,6 +18,7 @@ class BlrMoveFactory(AbstractMoveFactory):
         if k in self.dimension_to_moves.keys():
             return self.dimension_to_moves[k]
 
+        print("Creating moves from " + str(k))
         moves = []
         u = uniform(0, 1)
         n = normal(0, 1)

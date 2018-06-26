@@ -234,7 +234,7 @@ Celé apriorní rozdělení je tedy jen pro úplnost:
 \begin{align}
 f(\theta_m) = f_1(\theta_m)f_2(\theta_m)f_3(\theta_m).
 \end{align} \par
-Pravděpodobnostní rozdělení bude podobné jako v modelu bez zlomů. Rozdíl je, že zde je přímka rozdělena na obecně $m$ částí, takže je třeba se vzít v potaz to kde leží bod pro který počítáme pravděpodobnost. Nejdříve si zavedu pomocnou funkci, která nám udá pravděpodobnost pro jeden bod, přes jeden interval. Tu potom využiji v obecnější funkci, která už jde přes všechny možné intervaly. Takže nějak takto:
+Pravděpodobnostní rozdělení bude podobné jako v modelu bez zlomů. Rozdíl je, že zde je přímka rozdělena na obecně $m$ částí, takže je třeba vzít v potaz to, kde leží bod pro který počítáme pravděpodobnost. Nejdříve si zavedu pomocnou funkci, která nám udá pravděpodobnost pro jeden bod, přes jeden interval. Tu potom využiji v obecnější funkci, která už jde přes všechny možné intervaly. Takže nějak takto:
 \begin{align}
 \hat{f}(y_i | \sigma^2, s_1, h_1, s_2, h_2) = \mathcal{N}(y - [(x - s_1)\frac{h_2 - h_1}{s_2 - s_1} + h_1], \sigma^2), \\
 f(y | \theta_m) = \sum_{i=0}^{m} I(s_j < X_i < s_{j+1}) 
@@ -245,9 +245,9 @@ Nyní máme pravděpodobnostní rozdělení a apriorní rozdělení, takže jeji
 f(\theta_m | y) \propto \prod_{i=0}^{n} f(y_i | \theta_m) f(\theta_m).
 \end{align}
 \subsection{Model s více zlomy a různým počtem dimenzí}
-V předešlé sekci jsme popsali model s nějakým počtem zlomů. V naší úloze, ale nakonec chceme najít, který z takovýchto modelů je pro naše data nejlepší. Proto nakonec potřebujeme ještě obecnější model a to takový, který dokáže shrnout modely s různým počtem zlomů. Parametr bude v takovém modelu vypadat následovně 
+V předešlé sekci jsme popsali aposteriorní rozdělení modelu s konkrétním počtem zlomů. Teď bychom chtěli najít aposteriorní rozdělení takového modelu, kde i počet zlomů je součástí parametru. Ekvivalentně je možné říct, že řešíme Bayesovskou volbu modelu, kde jednotlivé modely jsou regrese s různým počtem zlomů. Parametr bude v takovém modelu vypadat následovně 
 \begin{align}
-\theta = \bigcup_{m=0}^q\{m\} \times \theta_m,
+\Theta = \bigcup_{m=0}^q\{m\} \times \Theta_m,
 \end{align}
 kde $q \in \mathcal{N}$ a omezuje mezi kolika modely můžeme vybírat. Je to technické omezení, tak ať nemusíme pracovat s parametrem nekonečné dimenze. Nyní si zadefinujeme apriorní rozdělení, tedy:
 \begin{align}

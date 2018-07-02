@@ -201,7 +201,7 @@ Nyní se tedy dostáváme k tomu jak vypadá model s více zlomy. Nyní učiňme
 \end{align}
 kde $\sigma^2$ je rozptyl náhodné složky $\epsilon_i$ a pro všechna $i$ body $s_i$ určují x-ové souřadnice bodů určujících přímku a $h_i$ určují y-ové souřadnice. $m$ je index modelu a zároveň počet zlomů. Body $(s_1, h_1)$ a $(s_{m+1}, h_{m+1})$ určují první, respektive poslední bod definující funkce.\par
 Pro tento model už neexistuje konjugované apriorní rozdělení, protože parametrický model dat netvoří exponencialní rodinu \cite{b}, což má za následek to že, aposteriorní rozdělení už nebude mít uzavřenou formu a my nebudeme schopni analyticky spočítat parametry nového modelu, z toho důvodu budeme muset numericky aproximovat aposteriorní rozdělení metodami Markov Chain Monte Carlo. Prozatím se tedy zaměříme na to, jak náš model bude vypadat. Výhodou je, že už se teď nemusíme ohlížet na nějaké značně restriktivní konjugované apriorní rozdělení, ale můžeme si apriorní rozdělení nastavit takřka, jak chceme.\par
-Rozdíl v parametrickém modelu dat oproti modelu beze zlomu je, že zde je přímka rozdělena na obecně $m$ částí, takže je třeba vzít v potaz to, kde leží bod pro který počítáme pravděpodobnost. Nejdříve si zavedeme pomocnou funkci, která nám udá pravděpodobnost pro jeden bod, přes jeden interval. Tu potom využiji v obecnější funkci, která už jde přes všechny možné intervaly. Takže nějak takto:
+Rozdíl v parametrickém modelu dat oproti modelu beze zlomu je, že zde je přímka rozdělena na obecně $m$ částí, takže je třeba vzít v potaz to, kde leží bod pro který počítáme pravděpodobnost. Nejdříve si zavedeme pomocnou funkci, která nám udá pravděpodobnost pro jeden bod, přes jeden interval. Tu potom využiji v obecnější funkci, která už jde přes všechny možné intervaly. Tedy:
 \begin{align}\label{parameticky_model}
 \hat{f}(y_i | \sigma^2, s_1, h_1, s_2, h_2) = \mathcal{N}(y - [(x - s_1)\frac{h_2 - h_1}{s_2 - s_1} + h_1], \sigma^2), \\
 f(y | \theta_m) = \sum_{i=0}^{m} I(s_j < X_i < s_{j+1}) 
@@ -220,7 +220,7 @@ Apriorní rozdělení na y-ových souřadnicích $h_1, ..., h_{m+1}$ by mělo b�
 \begin{align}
 f(h_1,..., h_{m+1}) \propto \prod_{i=1}^{m+1} I(y_{min} \leq y_i \leq y_{max}),
 \end{align}
-kde opět $y_min$ a $y_max$ jsou nejmenší respektive největší $y$-ové hodnoty v datech. \par
+kde opět $y_{min}$ a $y_{max}$ jsou nejmenší respektive největší $y$-ové hodnoty v datech. \par
 Pro rozptyl použijeme useknuté normální rozdělení s tím, že rozptyly menší nebo rovné nule mají nulovou pravděpodobnost:
 \begin{align}
 f(\sigma^2) \propto 
@@ -234,7 +234,7 @@ Celé apriorní rozdělení je tedy jen pro úplnost:
 \begin{align}\label{apriorni}
 f(\theta_m) = f(s_1, ..., s_{m+1})f(h_1,..., h_{m+1})f(\sigma^2),
 \end{align}
-tj. předpokládáme nezávislost $h,s,\sigma^2$. \par
+tj. předpokládáme nezávislost $h,s,\sigma^2$, kde $s=s_1, ..., s_{m+1}$, $h=h_1,..., h_{m+1}$. \par
 
 Nyní máme pravděpodobnostní rozdělení a apriorní rozdělení, takže jejich vynásobením a průchodem přes všechny vzorky získáváme aposteriorní rozdělení až na multiplikativní konstantu
 \begin{align}
@@ -245,7 +245,7 @@ V předešlé sekci jsme popsali aposteriorní rozdělení modelu s konkrétním
 \begin{align}
 \boldsymbol{\Theta} = \bigcup_{m=1}^K\{m\} \times \boldsymbol{\Theta_m}.
 \end{align}
- Nyní si zadefinujeme apriorní rozdělení, tedy:
+ Nyní si zvolíme apriorní rozdělení, tedy:
 \begin{align}
 f(m, \theta_m) = f(\theta_m | m)f(m).
 \end{align}

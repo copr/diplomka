@@ -72,8 +72,8 @@ class Rjmcmc:
     def sample(self, n, first_sample):
         samples = [first_sample]
         for i in range(1, n):
-            newsample = self.step(samples[i-1])
-            samples.append(newsample)
+            new_sample = self.step(samples[i-1])
+            samples.append(new_sample)
             # progress bar
             sys.stdout.write("\r\t%.0f%% Done" % (100*i/n))
             sys.stdout.flush()

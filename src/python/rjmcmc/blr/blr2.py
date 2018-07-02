@@ -21,8 +21,8 @@ class Blr2:
         @param ys - yove souradnice dat
         @param n_breaks - pocet zlomu
         '''
-        if len(xs) is not len(ys):
-            raise RuntimeError("Not matchin dimension")
+        if not (len(xs) == len(ys)):
+            raise RuntimeError("Not matching dimension. Dimension xs=" + str(len(xs)) + " Dimension ys=" + str(len(ys)))
         self.xs = xs
         self.ys = ys
         self.max_x = max(xs)

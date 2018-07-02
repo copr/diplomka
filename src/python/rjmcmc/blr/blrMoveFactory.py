@@ -111,7 +111,3 @@ class BlrMoveFactory(AbstractMoveFactory):
         return theano.function([x], f), jacobian
 
 
-f = BlrMoveFactory()
-mvs = f.get_moves_from(1)
-sample = (1, [1, 1, 1, 5, 5, 7, 7])
-(newx, u, newu, det_jacobian) = mvs[0].transform(sample)

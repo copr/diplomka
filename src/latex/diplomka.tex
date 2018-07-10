@@ -105,7 +105,7 @@ V dalším textu, pokud bude význam zřejmý z kontextu
 	\item u hustot nebudeme uvádět indexy, je-li N.V. určena argumentem, tj. např $f(\theta)$ značí $f_{\Theta}(\theta)$ apod.
 	\item všechny integrály chápeme jako určité přes obor hodnot.
 \end{itemize}
-\subsection{Bayesovská volba modelu}
+\subsection{Bayesovská volba modelu}\label{model_choice}
 V předchozí části jsme se zabývali situací s jedním konkrétním modelem, nyní se zabývejme obecnější situací, kdy máme množinu více modelů. Předpokládejme tedy, že máme $K$ modelů a označme $M$ index modelu, která nabývá hodnot $\{1, ..., K\}$. M je tedy dalším parametrem. Pro každý z modelů předpokládáme, že data mají pravděpodobnostní hustotu $f(y |m,  \theta_m)$, kde $\theta_m$ určuje parametry modelu $m$ a toto $\theta_m$ má dimenzi $D_m$, jinými slovy tedy $\theta = (m, \theta_m)$. Množina parametrů modelu $f(y |m,  \theta_m)$ je tedy:
 \begin{align}
 \boldsymbol{\Theta} = \bigcup_{m=1}^{K} \{m\} \times \boldsymbol{\Theta}_m,
@@ -268,20 +268,29 @@ Jako aposteriorní rozdělení tedy máme:
 	f(m, \theta_m | y) = f(y | m, \theta_m)f(m, \theta_m).
 \end{align}
 \section{MCMC}
-Aposteriorní distribuce mají často takový tvar, že je jakýkoli analytický výpočet nemožný. V takový moment se buď musíme spokojit s jednodušším modelem, jehož aposteriorní distribuce umožňuje analytický výpočet a nebo se musíme uchýlit k numerickým aproximacím dané distribuce. MCMC je skupina algoritmů, která dokáže vzorkovat z dané distribuce. Ze získaných vzorků potom můžeme zjistit například bayesovký interval spolehlivosti jen tím, že si ze vzorků spočítáme kvantily o které máme zájem. Dále se získané vzorky dají využít pro Monte Carlo integraci nebo různé optimalizační problémy. \par
-V této kapitole si nejprve ukážeme jak funguje MC integrace a poté přejdeme k Markovským řetězcům, které jsou základem MCMC algoritmů. Nakonec popíšeme nejrozšířenější MCMC algoritmus a to Metropolis-Hastings.
-% MCMC (Markov Chain Monte Carlo) je skupina algoritmů pro generování vzorků z předem známé pravděpodobnostní distribuce $\pi(x)$. Tyto algoritmy se často používají právě v Bayesovské statistice, kde aposteriorní distribuce často mají takový tvar, že se s nimi nedá analyticky počítat. 
-%MCMC (Markov Chain Monte Carlo) je algoritmus pro generovaní vzorků z distribuce $\pi(x)$. Funguje to tak, že konstruuje vzorky jako Markovský řetězec, čili každý vzorek nějakým způsobem závisí na vzorku předchozím. Tento řetězec je konstruován tak, aby jeho stacionární distribuce konvergovala k naší $\pi(x)$, což v případě po částech lineární regrese bude aposteriorní distribuce, kterou jsme dostali v jedné z předchozích kapitol. Než se dostaneme k MCMC algoritmům, ukážeme si jedno jejich využití a poté něco o tom co budeme chtít, aby náš Markovský řetězec splňoval.
+Aposteriorní distribuce mají často takový tvar, že je jakýkoli analytický výpočet nemožný. V takový moment se buď musíme spokojit s jednodušším modelem, jehož aposteriorní distribuce umožňuje analytický výpočet a nebo se musíme uchýlit k numerickým aproximacím dané distribuce. Toto nám umožňují algoritmy Monte Carlo, které dané distribuce aproximují pomocí množiny vzorků. Samotné algoritmy Markov Chain Monte Carlo (MCMC) tvoří podmnožinu algoritmů MC. Z vzorků získaných MC algoritmem můžeme například aproximovat střední hodnotu náhodné veličiny (tj. výpočet integrálu), získat přibližný odhad spolehlivosti či přibližně vyřešit optimalizační problém. \par
+V této kapitole si nejprve ukážeme jak funguje MC integrace a poté přejdeme k Markovským řetězcům, které jsou základem MCMC algoritmů. Nakonec popíšeme nejrozšířenější MCMC algoritmus a to Metropolisův-Hastingsův algoritmus\cite{robert2004monte}.
 \subsection{Monte Carlo Integrace}
-V této části budeme řešit obecný problém jak vyřešit integrál ve formě:
-\begin{align} \label{integral}
-	I = \int_{\mathcal{X}} f(x)p(x) dx,
-\end{align}
-kde $\mathcal{X}$ je nějaká množina přes kterou chceme integrovat. Stejným způsobem je definována střední hodnota náhodné veličiny $X$ $E[h(X)] = I$.  Nyní mějme výběr $(X_1, ..., X_m)$ vygenerovaný z hustoty $p$, poté je přirozené aproximovat \ref{integral} průměrem:
+Již jsme naznačili,že  myšlenkou MC simulací je aproximace distribuce $f(x)$, definované na prostoru $\mathbb{X}$, množinou nezávislých vzorků $\{x^{(i)}\}_{i=1}^{N}$. Je tedy možné aproximovat integrály $I(h)$ posloupností sum $I_n(h)$, která konverguje následujícím způsobem
 \begin{align}
-	f_m = \frac{1}{m}\sum_{j=1}^{m}f(x_j)
+	I_N(h) = \frac{1}{N}\sum_{i=1}^N h(x^{(i)}) \xrightarrow{s.j.} I(f) = \int_{\mathbb{X}} h(x)f(x)dx.
 \end{align}
-který ze zákona velkých čísel konverguje skoro jistě k $E[h(X)]$. 
+Tedy, odhad $I_N(h)$ je nestranný odhad a podle zákona velkých čísel bude konvergovat skoro jistě k $I(h)$, tedy ... . Pokud rozptyl $h(x)$ splňuje $\sigma^2_h = E_{f(x)}(f^2(x) - I^2(x)) < \infty$, pak je $var(I_N(h)) = \frac{\sigma^2_h}{H}$ a podle centrální limitní věty bude platit
+\begin{align}
+	\sqrt{N}(I_N(h) - I(h)) \Rightarrow \mathcal{N}(0, \sigma^2_f),
+\end{align}
+kde $\Rightarrow$ značí konvergenci v distribuci, tj. pokud platí $\lim_{n\rightarrow \infty} F_n(x) = F(x)$ pro všechna  $x \in \mathbb{R}$, kde je $F$ spojitá. Zde je $F_n$ respektive $F$  distribuční funkce náhodné veličiny $X_n$ respektive $X$.
+\par
+
+%V této části budeme řešit obecný problém jak vyřešit integrál ve formě:
+%\begin{align} \label{integral}
+%	I = \int_{\mathcal{X}} f(x)p(x) dx,
+%\end{align}
+%kde $\mathcal{X}$ je nějaká množina přes kterou chceme integrovat. Stejným způsobem je definována střední hodnota náhodné veličiny $X$ $E[h(X)] = I$.  Nyní mějme výběr $(X_1, ..., X_m)$ vygenerovaný z hustoty $p$, poté je přirozené aproximovat \ref{integral} průměrem:
+%\begin{align}
+%	f_m = \frac{1}{m}\sum_{j=1}^{m}f(x_j)
+%\end{align}
+%který ze zákona velkých čísel konverguje skoro jistě k $E[h(X)]$. 
 %\begin{enumerate}
 %	\item Navzorkujeme $n$ i.i.d \myworries{zadefinovat nekde } vzorků z distribuce $f(x)$. %\myworries{musi to byt distribuce?}
 %	\item Aplikujeme funkci $g$ na všechny vzorky a zprůměrujeme $I_N = %\frac{1}{N}\sum_{i=1}^{N}g(x_i)$
@@ -303,60 +312,57 @@ který ze zákona velkých čísel konverguje skoro jistě k $E[h(X)]$.
 %\begin{align}
 %	\frac{1}{N}\sum_{i=1}^{N}g(x_i) \overset{a.s.}{\to} \int_{I} g(x)f(x) dx.
 %\end{align}
-Chceme-li tedy počítat nějaký integrál, který nepochází ze statistické úlohy, je třeba si zvolit  návrhovou distribuci z které budeme vzorkovat. Jako nejjednodušší se jeví uniformní distribuce, neboť její použití je snadné a vede jen k přenásobení integrálu konstantou. Toto nemusí především ve vyšších dimenzích být vhodné, protože při procházení dané funkce uniformě můžeme narazit na velmi málo nenulových míst nebo míst, která špatně charakterizují funkce a proto se dostaneme ke správnému výsledku až s velkým počtem vzorků. Tento problém můžeme vyřešit buďto použitím jiné návrhové distribuce, takže za $f(x)$ volíme nějakou $\Phi(x)$ a za $\overset{~}{g)}(x) = \frac{g(x)}{\Phi(x)}$ tato metoda se nazývá importance sampling \cite{robert2004monte}. A nebo budeme rovnou vzorkovat z funkce $f$ pomocí nějakého MCMC algoritmu a jen vzorky zprůměrujeme. \par
-Navíc víme, že pokud je rozptyl f(x) konečný, pak rozptyl našeho odhadu je roven $\frac{\sigma^2_f}{N}$ a taky víme, že rozdělení chyby konverguje k normálnímu rozdělení s nulovou střední hodnotou a rozptylem funkce f \cite{andrieu2003introduction} \par 
-
-\begin{align}
-	\sqrt{N)}(I_N(f) - I(f)) \to \mathcal{N}(0, \sigma^2_f).
-\end{align}
+Chceme-li počítat integrál, kde nejde primárně o výpočet střední hodnoty, je možné jej jako výpočet střední hodnoty vyjádřit. Proto je potřeba zvolit distribuci $f(x)$ z které budeme vygenerovat vzorky. Pro výpočty integrálů s omezeným integračním oborem se jeví výhodné použít uniformní distribuci. Toto nemusí být především ve vyšších dimenzích vhodné, protože vedou k vysokému rozptylu odhadu a tedy k nutnosti použít vysoký počet vzorků. Další možnosti řešení jsou použiti metod Rejection sampling, Importance sampling \cite{andrieu2003introduction} a nebo v případě kdy už nejsme schopni vzorkovat pomocí předchozích metod použít jeden z MCMC algoritmů. \par
 \subsection{Markovský řetězec}
-Markovův řetězec je posloupnost náhodných veličin, s pravděpodobností přechodu závisející na konkretním stavu ve kterém se řetězec nachází. Proto se řetězec definuje přechodovým jádrem, což je funkce určující přechody. 
-
+Markovův řetězec je posloupnost náhodných veličin, s pravděpodobností přechodu závisející na konkretním stavu ve kterém se řetězec nachází. \par
+V celé této části budeme uvažovat pravděpodobnostní prostor $(\mathcal{X}, \mathcal{B}(\mathcal{X}), P)$, kde $\mathcal{X} = \mathbb{R}^n$, $\mathcal{B}$ je borelovská $\sigma$-algebra a $P$ je pravděpodobnostní míra.
 \begin{definition}
-	Přechodové jádro je funkce K definovaná na $\mathcal{X} \times \mathcal{B}(\mathcal{X})$ taková, že 
+	Přechodové jádro je funkce $K: \mathcal{X} \times \mathcal{B}(\mathcal{X}) \rightarrow [0, 1]$ taková, že 
 	\begin{itemize}
-	\item $\forall x \in \mathcal{X}$, $K(x, \dot)$ je pravděpodobnostní míra,
-	\item $\forall A \in \mathcal{B}(\mathcal{X})$, $K(\dot, A)$ je měřitelná.
+	\item $\forall x \in \mathcal{X}$, $K(x, \cdot)$ je pravděpodobnostní míra,
+	\item $\forall A \in \mathcal{B}(\mathcal{X})$, $K(\cdot, A)$ je měřitelná.
 	\end{itemize}
-
-	Když je $\mathcal{X}$ diskrétní, přechodové jádro je přechodová matice K s prvky
-	\begin{equation*}
-		P_{xy} = P(X_n = y| X_{n-1} = x), x, y \in (\mathcal{X}).
-	\end{equation*}
-	Ve spojitém případě jádro také určuje podmíněnou hustotu $K(x, x^{,})$ přechodu $\mathcal{X}$, $K(x, \dot)$, tedy $P(X \in A| x) = \int_A K(x, x^{,}) dx^{,}$. 
 \end{definition}
+
+
 
 To, že máme přechodové jádro ještě nemusí stačit, proto aby byla posloupnost náhodných veličin Markovovský řetězec musí platit, že podmíněné pravděpodobnostní rozdělení dalšího stavu záleží jen na stavu předchozím.
 
 \begin{definition}
-	Mějme přechodové jádro K, posloupnost $X_0, X_1, ..., X_n, ...$ náhodných veličin je Markovovský řetězec, pokud pro jakékoli $t$ podmíněna distribuce $X_t$ za $x_{t-1}, x_{t-2}, ..., x_0$ je stejná jako distribuce $X_t$ za $x_{t-1}$, tedy:
+	Mějme přechodové jádro K, posloupnost $X_1, ..., X_n, ...$ náhodných veličin je Markovský řetězec s přechodovým jádrem $K$, pokud pro $t \in \mathbb{N}$ podmíněna distribuce $X_{t+1}$ za $X_t = x_{t}, X_{t-1}=x_{t-1}, ..., X_1 = x_1$ je stejná jako distribuce $X_{t+1}$ za $X_t = x_t$, tedy:
 	\begin{equation*}
-		P(X_{k+1} \in A| x_0, x_1, x_2, ... , x_k) = P(X_{k+1} \in A| x_k) \\
-		= \int_A K(x_k, dx).
+		P(X_{t+1} \in A| X_t = x_{t}, X_{t-1}=x_{t-1}, ..., X_1 = x_1) = P(X_{t+1} \in A| X_t = x_t) \\
+		= \int_A K(x_t, dx).
 	\end{equation*}
-	Řetězec je homogenní pokud:
+	Řekneme, že řetězec je homogenní pokud:
 	\begin{equation*}
-		P(X_{k+1} | y) = P(X_k | y).
+		P(X_{t+1} | y) = P(X_t | y).
 	\end{equation*}
 \end{definition} \par
+Když je $\mathcal{X}$ diskrétní, přechodové jádro lze charakterizovat přechodovou maticí K s prvky
+\begin{equation*}
+P_{xy} = P(X_t = y| X_{t-1} = x), x, y \in (\mathcal{X}).
+\end{equation*}
 
-Pro využití v MCMC jsou důležité dvě vlastnosti Markovovských řetězců a to neredukovatelnost a aperiodicita. Neredukovatelnost zjednodušeně říká, že Markovovský řetězec se někdy dostane do každého možného stavu nezávisle na tom v jakém stavu jsme začali. Formálně pak 
+Ve spojitém případě jádro také určuje podmíněnou hustotu $\mathcal{K}(x, x^{,}):\mathbb{R}^n \times \mathbb{R}^n \rightarrow \mathbb{R}$ přechodu $K(x, \cdot)$, tedy $P(X \in A| x) = K(x, A) = \int_A \mathcal{K}(x, x^{,}) dx^{,}$. 
+
+
+Pro využití v MCMC jsou důležité dvě vlastnosti Markovovských řetězců a to neredukovatelnost a aperiodicita. Neredukovatelnost zjednodušeně říká, že Markovovský řetězec se někdy dostane do každého možného stavu nezávisle na tom v jakém stavu jsme začali.
 \begin{definition}
-	Nechť $\phi$ je míra, pak Markovský řetězec $(X_n)$ s přechodovým jádrem $K(x,y)$ je $\phi$ 
-	neredukovatelný pokud, pro všechny $A \in \mathcal{B}(\mathcal{X})$ s $\phi(A) > 0$, existuje n takové, že $K^n(x, A) > 0$ pro všechna $x \in \mathcal{X}$. \\
-	Řetěz je silně $\phi$-neredukovatelný pokud $n=1$ pro všechny měřitelné $A$.
+	Nechť $\phi$ je míra na $(\mathcal{X}, \mathcal{B}(\mathcal{X}))$, pak Markovský řetězec $(X_t)$ s přechodovým jádrem $K(x,y)$ je $\phi$ 
+	neredukovatelný pokud, pro všechny $A \in \mathcal{B}(\mathcal{X})$ s $\phi(A) > 0$, existuje n takové, že $K^n(x, A) > 0$ pro všechna $x \in \mathcal{X}$, kde $K^n$ je n-té složení $K$, tedy $K^n = K \circ K^{n-1}$.  \\
 \end{definition}
 
 Aperiodicitou myslíme, že stavy které v řetězci navštěvujeme se periodicky nepakují. V diskrétním případě se perioda stavu $\omega \in \mathcal{X}$ definuje jako:
 \begin{align}
-	d(\omega) = \gcd {m \geq; K^m(\omega, \omega) > 0},
+	d(\omega) = \gcd \{m \geq 1; K^m(\omega, \omega) > 0\},
 \end{align}
-kde $\gcd$ znamená největší společný dělitel. Říkáme tedy, že neredukovatelný Markovský řetěz je aperiodický pokud má periodu 1. Definice v obecném případě je složitější, proto ji necháváme na vhodnějším zdroji \cite{robert2004monte}. \par
+kde $\gcd$ znamená největší společný dělitel. Říkáme tedy, že neredukovatelný Markovský řetěz je aperiodický pokud má periodu 1. Diskuzi obecného případu necháváme na vhodném zdroji \cite{robert2004monte}. \par
 
 V MCMC metodách se používají takové řetězce u kterých marginální distribuce $X_n$ nezávisí na $n$. U takových řetězců, tedy požadujeme, aby existovala pravděpodobnostní distribuce $\pi$ taková, že $X_{n+1} \sim \pi$ pokud $X_n \sim \pi$. Tato distribuce nám tedy říká s jakou pravděpodobnostní se vyskytuje nějaký stav $x$ v řetězci. 
 
 \begin{definition}
-	$\sigma$-konečná míra $\pi$ je invariantní pro přechodové jádro $K(\dot, \dot)$ pokud
+	$\sigma$-konečná míra $\pi$ je invariantní pro přechodové jádro $K(\cdot, \cdot)$ pokud
 	\begin{equation*}
 		\pi(B) = \int_{\mathcal{X}} K(x, B)\pi(dx), \forall B \in \mathcal{B}(\mathcal{X}).
 	\end{equation*}
@@ -364,48 +370,20 @@ V MCMC metodách se používají takové řetězce u kterých marginální distr
 Invariantní distribuce se také říká stacionární pokud $\pi$ je pravděpodobnostní míra. \par 
 Postačující podmínkou pro existenci stacionární distribuce $\pi$, je takzvaná detailed balance podmínka
 \begin{definition}\label{detailed_balanced}
-	Markovovský řetězec s přechodovým jádrem $K$ splňuje detailed balance podmínku pokud existuje funkce $\pi$ taková, že
+	Markovovský řetězec s přechodovým jádrem $K$ splňuje "detailed balance"\ podmínku pokud existuje funkce $\pi$ taková, že
 	\begin{equation*}
 		K(y, x)\pi(y) = K(x, y)\pi(x), \forall x,y \in \mathcal{X}.
 	\end{equation*}
 \end{definition}
-Pokud přechodová matice $K$ splňuje podmínky neredukovatelnosti a aperiodicity pak platí, že pro jakýkoli počáteční stav, řetězec konverguje ke stacionární distribuci $\pi(x)$. K zajištění toho, že konkrétní $\pi(x)$ je stacionární distribuce se v MCMC algoritmech používá podmínka \ref{detailed_balanced}. Diskuzi obecného případu opět přenecháváme povolanějším \cite{robert2004monte}.
+Pokud přechodová matice $K$ splňuje podmínky neredukovatelnosti a aperiodicity pak platí, že pro jakýkoli počáteční stav, řetězec konverguje ke stacionární distribuci $\pi(x)$. K zajištění toho, že konkrétní $\pi(x)$ je stacionární distribuce se v MCMC algoritmech používá detailed balance podmínka. Diskuzi obecného případu opět přenecháváme literatuře \cite{robert2004monte}.
 
 
-%Jak už jsme nastínili Markovský řetězec je nějaká sekvence vzorků, kde pravděpodobnost každého dalšího vzorku záleží jen na vzorku předchozím. Přesněji řečeno Markovský řetězec je stochastický proces pro který platí
-%\begin{align}
-%	p(x^i | x^{i-1}, ... , x^1) = T(x^i | x^{i-1}),
-%\end{align}
-%kde všechna $x$ jsou z nějakého stavového prostoru $X$. Tento prostor může být diskrétní i spojitý. Funkci T \myworries{to asi neni byt funkce?} se říká přechodové jádro a udává pravděpodobnost přechodu z předešlého stavu do nového stavu. Dále říkáme, že řetězec je homogenní pokud $T(x^{(i)}|x^{(i-1})$ zůstává invariantní pro všechna $i$. \myworries{intuitivnejsi vysvetleni} \par
-% discrete markov chain
-%Jako příklad si uvedeme Markovův řetězec na konečné množině hodnot $) \in X = {1,2,3}$. Ten si můžeme představit jako vážený orientovaný graf kde jednotlivé uzly představují jednotlivé stavy $x_i$ a váhy hran představují pravděpodobnosti přechodů z jednoho stavu do druhého. Diskrétní Markovův řetězec můžeme reprezentovat jako matici přechodů. Pro daný Markovův řetězec například takto 
-%\myworries{obrazek}
-%\[
-%T=
-%\begin{bmatrix}
-%    0 & 1 & 0  \\
-%    0 & 0.1 & 0.9 \\
-%    0.6 & 0.4 & 0
-%\end{bmatrix}
-%\]
-%Pokud je pravděpodobnost pro počáteční stav $\mu(x^1) = (0.5, 0.2, 0.3)$, pak zřejmě 
-%$\mu(x^1)T = (0.2, 0.6, 0.2)$ a po několika iteracích produkt $\mu(x^1)T^t$ konverguje k 
-%$\pi(x) = (0.2, 0.4, 0.4)$. Této distribuci se říká stacionární a je moc důležité ji znát, jak ví Sergey Brin a Larry Page \myworries{ref pagerank a nebo radsi ne? :D}. V tomto případě nezáleží na počátečním stavu a jak ještě uvidíme toto je vlastnost, kterou chceme mít u našich řetězů vždy. Existence stacionární distribuce je zaručena pokud T je stochastická a splňuje následující dvě vlastnosti:
-%\begin{enumerate}
-%	\item Irreducibility \myworries{preklad}. Z každého stavu je možné se dostat do všech dalších stavů. 
-%	\item Aperiodicita. Řetězec se nezacykluje.  
-%\end{enumerate}
-%Postačující podmínkou pro zajištění toho, že daný řetězec má za stacionární distribuce $\pi(x)$ je \myworries(preklad) 
-%\begin{align}
-%	\pi(x^i)T(x^{i-1} | x^i) = \pi(x^{i-1})T(x^i | x^{i-1})
-%\end{align} ,
-%\myworries{zkusit vysvetlit tu reversibility podminku}
-\subsection{Metropolis-Hastings}
-Metropolis-Hastings je nejpopulárnější MCMC algoritmem. Pomocí něj můžeme vzorkovat z libovolné distribuce  $\pi(x)$, kterou umíme bodově vyčíslit až na normalizační konstantu. Jeden krok Metropolis-Hastings algoritmu se skládá z navržení nového vzorku $x^*$ z nějaké návrhové distribuce $q(x^* | x)$, tedy návrh nového vzorku $x^*$ je podmíněný předchozím vzorkem $x$. A poté s pravděpodobností  $A(x, x^*) = min(1, \frac{q(x | x^*)\pi(x^*)}{q(x^* | x)\pi(x)})$ příjmáme nový vzorek. Pokud nový vzorek nepříjmeme označíme za nový vzorek původní vzorek $x$. \par 
+\subsection{Metropolisův-Hastingsův algoritmus}
+Metropolis-Hastings je nejpopulárnější MCMC algoritmem. Pomocí něj můžeme vzorkovat z distribuce  $\pi(x)$, kterou umíme bodově vyčíslit až na normalizační konstantu. Jeden krok Metropolis-Hastings algoritmu se skládá z navržení nového vzorku $x^*$ z nějaké návrhové distribuce $q(x^* | x)$, tedy návrh nového vzorku $x^*$ je podmíněný předchozím vzorkem $x$. A poté s pravděpodobností  $A(x, x^*) = min(1, \frac{q(x | x^*)\pi(x^*)}{q(x^* | x)\pi(x)})$ příjmáme nový vzorek. Pokud nový vzorek nepříjmeme označíme za nový vzorek původní vzorek $x$. \par 
  %Důkaz zde ukazovat nebudeme, protože je dosti technický a není z něj moc vidět proč by to mělo fungovat. Jde v něm ale o to, že takto vytvořený Markovský řetězec splňuje reversibility podmínku a tudíž jeho stacionární distribucí je $\pi(x)$. \par 
-Přechodové jádro pro Metropolis-Hastings algoritmus je:
+Pro přechodové jádro Metropolisova-Hastingsova algoritmu platí:
 \begin{align}
-K_{MH}(x^{i+1} | x^{i}) = q(x^{i+1} | x^i) A(x^i, x^{i+1}) = \delta_{x^i}(x^{i+1})r(x^{i})
+K_{MH}(x^i, A) = \int_A q(x | x^i) A(x^i, x)dx + \delta_{x^i}(A)r(x^{i}) 
 \end{align}
 kde $r(x^i)$ popisuje pravděpodobnost odmítnutí vzorku:
 \begin{align}
@@ -415,9 +393,9 @@ Přechodové jádro splňuje detailed balance podmínku:
 \begin{align}
  \pi(x^i)K_{MH}(x^{i+1}| x^i) = \pi(x^{i+1})K_{MH}(x^i | x^{i+1})
 \end{align}
-tudíž Markovský řetězec konstruovaný tímto jádrem má $\pi(x)$ jako svoji stacionární distribuci. Pro to, že k ní skutečně dokonverguje, je potřeba vědět, jestli takto zkonstruovaný řetězec je aperiodický a irreducible. Z toho, že přechodové jádro vždy umožňuje nový vzorek odmítnout, následuje to, že řetězec je aperiodický. K tomu aby byl řetězec neredukovatelný, stačí zajistit, že nosič návrhové distribuce je stejný jako nosič  $\pi(x)$ \cite{andrieu2003introduction}. \par 
-Úspěch algoritmu je hodně závislý na použité návrhové distribuci, může se stát, že pokud použijeme špatnou návrhovou distribuci zůstaneme na jednom místě a nikdy se nepohneme z prvotního vzorku. Naopak výhodou algoritmu je fakt, že distribuci, z které chceme vzorkovat stačí znát bez normalizační konstanty. Tohoto faktu využíváme i v naší aplikaci. Je to z toho důvodu, že normalizační konstanty se objeví v čitateli i jmenovateli při výpočtu pravděpodobnosti přechodu a tudíž se vykrátí. \par
-Samotná implementace algoritmu už je poměrně přímočará, jak je vidět na pseudo-kódu \ref{src:mj}. Časová náročnost bude dána počtem vzorků, které chceme získat, ale počtem pozorovaných dat. Pro každý nový vzorek se bude muset napočítat jeho pravděpodobnostní funkce a ta se bude rovnat produktu hustoty pravděpodobnosti aplikované na pozorované data. Tento fakt může vést k dlouhé době vzorkování.
+tudíž Markovský řetězec konstruovaný tímto jádrem má $\pi(x)$ jako svoji stacionární distribuci. Pro to abychom měli jistotu, že řetězec bude skutečně konvergovat k $\pi$ je potřeba ověřit předpoklady ireducibility a aperiodicity. Z toho, že přechodové jádro vždy umožňuje nový vzorek odmítnout, následuje to, že řetězec je aperiodický. K tomu aby byl řetězec neredukovatelný, stačí zajistit, že nosič návrhové distribuce je stejný jako nosič  $\pi(x)$ \cite{andrieu2003introduction}. \par 
+Efektivita algoritmu je hodně závislý na použité návrhové distribuci, může se stát, že pokud použijeme nevhodnou návrhovou distribuci bude algoritmus pomalu procházet prostorem. Naopak výhodou algoritmu je fakt, že distribuci, z které chceme vzorkovat stačí znát bez normalizační konstanty. Tohoto faktu využíváme i v naší aplikaci. Je to z toho důvodu, že normalizační konstanty se objeví v čitateli i jmenovateli při výpočtu pravděpodobnosti přijetí a tudíž se vykrátí. \par
+Samotná implementace algoritmu už je poměrně přímočará, jak je vidět na pseudo-kódu \ref{src:mj}. Časová náročnost bude dána nejen počtem vzorků, které chceme získat, ale také počtem pozorovaných dat. Pro každý nový vzorek se bude muset napočítat jeho pravděpodobnostní funkce a ta se bude rovnat produktu hustoty pravděpodobnosti aplikované na pozorované data. Tento fakt může vést k dlouhé době vzorkování.
 
 \begin{lstlisting}[label=src:mj,caption=Metropoli-Hastings]
 	samples = [first_sample]
@@ -433,27 +411,59 @@ Samotná implementace algoritmu už je poměrně přímočará, jak je vidět na
    		else:
    			samples.append(previous_sample)
 \end{lstlisting}
-\section{RJMCMC}
-Nyní se konečně dostáváme k algoritmu, který nám umožní vyřešit náš model.
-RJMCMC (Reversible Jump Markov Chain Monte Carlo)\cite{green2009reversible} jako takový nám umožní procházet stavy ve formě $(k, \theta_k) = (k, \theta_{k_1}, ..., \theta_{k_{n_k}})$. Stavový prostor pro takovou simulaci je $\mathcal{X} = \bigcup_{k \in K} ({k} \times \mathcal{X}_k)$, kde pro každé k je $X_k \subset R^{n_k}$ a $K$ je množina indexů všech přípustných modelů. V našem případě po částech lineární regrese je K množina jdoucí od nuly do nekonečna a každé číslo označuje počet zlomů, takže pro model 1 stav vypadá takto $(1, \theta_1) = (1, \sigma^2, s_1, h_1, s_2, h_2, s_3, h_3)$, kde $ \forall s_1, s_2, s_3, h_1, h_2, h_3 \in \mathcal{R}$ a $\sigma^2 > 0$. \par
-Půjde nám, podobně jako v předchozí kapitole, o to, sestavit markovovský řetězec tak, aby jeho stacionární distribuce byla $\pi(x)$, kde $x = (k, \theta_k)$. V konstrukci tohoto řetězce bude třeba navrhovat kroky, které umožní změnu dimenze a taky kroky, které prozkoumají prostor v současném modelu. Pro návrh kroků druhého typu se používají klasické MCMC algoritmy, v našem případě budeme používat algoritmus Metropolis-Hastings a protože jsme se tímto už zabývali v předchozí kapitole nebudeme se tímto již zabývat. Zůstávají nám tedy mezi modelové kroky. \par
-Různé modely ale mohou mít různou dimenzi a toto přináší s sebou problém s porovnáváním. Jak se dá porovnat pravděpodobnost kruhu a koule? Toto se řeší něčím čemu se říká Reversible Jump. Reversible jump se skládá jak z dopředného kroku kroku, která vezme současný stav $x = (k, \theta_k)$ do stavu nového $x^{,} = (k^{,}, \theta_k^{,})$, tak ze zpětného kroku, který provede opačný skok. Tyto přeskoky budeme indexovat v počitatelné množině $\mathcal{M}$ a pro každý přeskok $m \in \mathcal{M}$ máme pravděpodobnost, že se o něj pokusíme v současném stavu $x$ a tu značíme $j_m(x)$. Z každého modelu k, bude obvykle jen několik skoků o které se můžeme pokusit, většinou to budou takové skoky, které budou skákat do nejbližších možných dimenzí. Takže třeba v našem případě povolíme skok jen do modelu, který ma buď o jeden bod více nebo méně. Pro skok vpřed vygenerujeme $r_m$ náhodných čísel ze známé sdružené distribuce $g_m$ a nový stav $\theta^{,}_{k^{,}}$ je konstruován takto $(\theta^{,}_{k^{,}}, u^{,}) = h_m(\theta_k, u)$. Tady $u^{,}$ je $r^{,}_m$ náhodných čísel ze sdružené distribuce $g^{,}_m$, které jsou potřeba pro zpětný krok z $\theta^{,}_{k^{,}}$ do $\theta_k$ za použití inverzní funkce $h^,_m$.
-Důležité pro ně je, aby platilo $n + r = n^{'} + r^{'}$, tedy aby byly diferencovatelné.
+\subsection{Mixovaní přechodových jader}
+Důležitou vlastností MCMC algoritmů je možnost kombinovat několik přechodových jader pro konstrukci jednoho Markovova řetězce. Pokud tedy máme dvě přechodová jádra $K_1$, $K_2$ a $\pi(x)$ je invariantní distribuce pro obě jádra, pak hybridní jádro $vK_1 + (1-v)K_2$, kde $v \in [0,1]$, je také přechodové jádro s invariantní distribucí $\pi(x)$. Dále taky můžeme tyto dvě jádra použít v cyklu po sobě, tedy nejdřív navrhnout nový vzorek pomocí $K_1$ a poté navrhnout další vzorek pomocí $K_2$ a výsledné přechodové jádro bude mít opět invariantní distribuci $\pi(x)$ \cite{andrieu2003introduction}. \par
+Míchání jader můžeme využít například v případech, kdy $\pi(x)$ má několik extrému, ale mezi nimi oblasti s malou pravděpodobností. V takovém případě může být výhodné mít jedno jádro, které bude navrhovat větší skoky a tím nám umožní postupně procházet všechny extrémy a poté mít druhé jádro, které bude navrhovat malé skoky, čímž prozkoumáme $\pi(x)$ detailněji.  \par
+Cyklus MCMC jader se často využívá, když chceme pro různé části parametru použít jiné návrhové distribuce nebo v případě kdy nový vzorek přijímáme postupně, tak jak je  znázorněno v algoritmu \ref{src:super_verze}.
 
- V našem případě může jeden skok sloužit například k určení kde se objeví x-ová a y-ová souřadnice bodu, který přibude v modelu s vyšší dimenzí. Takže například:
-\begin{align}
-	h(\sigma^2, s_1, h_1, s_2, h_2, u_1, u_2) = (\sigma^2, s_1, h_1, u_1(s_2-s_1), u_2(h_2-h_1)), \\
-	h^{'}(\sigma^2, s_1, h_1, s_2, h_2, s_3, h_3) = (\sigma^2, s_1, h_1, s_3, h_3, \frac{s_2}{s_3-s_1}, \frac{h_2}{h_3-h_1}), \\
-	u_1 \sim U(0, 1), \\
-	u_2 \sim N(0.5, 3).
-\end{align}
-Na našem příkladě vidíme, že podmínka rovnajících se dimenzí je zachována a taky, že u inverzní transformace nemáme žádnou náhodnou veličinu a obecně ani není potřeba \ref{green}. \par
-Veškeré zvláštnosti týkající se RJMCMC jsme si již ukázali jediné co zbývá, je ukázat samotnou přechodovou pravděpodobnost:
+\begin{lstlisting}[label=src:super_verze,caption=Cyklus MH]
+def step(previous_sample):
+	proposal_sample = proposal.rvs(previous_sample)
+	local_previous_sample = copy(previous_sample)
+	final_sample = copy.copy(previous_sample)
+
+	for j, x in enumerate(proposal_sample):
+		local_previous_sample[j] = x
+		down = np.prod([
+			stationary.pdf(previous_sample),
+			proposal.pdf(local_previous_sample, previous_sample)])
+		up = np.prod([
+			stationary.pdf(local_previous_sample),
+			proposal.pdf(previous_sample, local_previous_sample)])
+
+		u = np.random.uniform()
+
+		if u < up/down:
+			final_sample[j] = x
+		else:
+			local_previous_sample[j] = previous_sample[j]
+
+	return final_sample
+\end{lstlisting}
+\section{RJMCMC}
+Nyní si ukážeme algoritmus Reversible Jump Markov Chain Monte Carlo (RJMCMC)\cite{green2009reversible}, jenž je zobecněním Metropolisova-Hastingsova algoritmu a dokáže vzorkovat z aposteriorní distribuce s parametry různé dimenze. S takovou situací jsme se teoreticky seznámili v podkapitole Bayesovská volba modelu \ref{model_choice}. 
+ \par
+Půjde nám, podobně jako v předchozí kapitole, o to, sestavit markovovský řetězec tak, aby jeho stacionární distribuce byla $\pi(x)$, kde $x = (m, \theta_m)$. V konstrukci tohoto řetězce je třeba kombinovat dva typy přechodových jader a to takové, které umožňují procházení prostoru $\boldsymbol{\Theta_m}$  pro  model $m$ a takové které dokáží přejít z jednoho modelu do druhého, tj. přechod z $x=(m, \theta_m)$ do $x^{,} = (m^{,}, \theta_{m^{,}})$, kde $m^{,}$ je index modelu do kterého přecházíme. V prvním případě se používají klasické MCMC algoritmy, tak jak byly popsány v předchozí kapitole. \par
+Různé modely ale mohou mít různou dimenzi a toto přináší s sebou problém s výpočtem pravděpodobnosti přijetí, protože hustoty, v modelu z kterého vycházíme, mohou být vzhledem k jiné míře než hustoty modelu do kterého přecházíme. Zmíněné míry jsou zpravidla Lebesgueovy míry, ale na prostorech jiné dimenze, RJMCMC tento problém řeší tím, že dorovná dimenze použitím náhodných veličin. Tímto se zajistí, že hustoty jsou definované vzhledem ke stejným mírám a tudíž se mohou porovnávat.  \par 
+Předpokládejme tedy, že $x$, $x^{,}$ mají dimenzi $n$ respektive $n^{,}$ a pomocné náhodné veličiny $u$, $u^{,}$ mají dimenzi $r$ respektive $r^{,}$. Nyní mějme deterministické, diferencovatelné, prosté funkce $h_p: \mathbb{R}^n \times \mathbb{R}^r: \rightarrow \mathbb{R}^{n^{,}} \times \mathbb{R}^{r^{,}}$ a $h^{,}_p: \mathbb{R}^{n^{,}} \times \mathbb{R}^{r^{,}} : \rightarrow \mathbb{R}^n \times \mathbb{R}^r$, takové, že $h_p(x, u) = (x^{,}, u^{,})$ a $h_p^{,}(x^{,}, u^{,}) = (x, u)$, kde $p$ je index přeskoku z konečné množiny $P$. Pro tyto funkce musí platit, aby $n+r=n^{,}+r^{,}$, kdyby toto neplatilo, nebudou obě transformace diferencovatelné \cite{green2009reversible}. Náhodné veličiny $u, u^{,}$ mají pravděpodobnostní distribuci $g_p(u)$, respektive $g^{,}_p(u)$ a jejich konkrétní tvar záleží na daném problému. Samotná pravděpodobnost toho, že se ve stavu $x$ pokusíme o přechod $p$ je dána pravděpodobnostní hustotou $j_p(x)$ respektive $j^{,}_p(x)$, pro konkrétní problém je možné nebo i výhodné, aby množina přechodů, o které se algoritmus pokusí v daném stavu $x$, byla podmnožinou $P$.    Samotná přechodová pravděpodobnost je dána:
 \begin{align}\label{rjmcmc_probability}
-	A_m(x, x^{,}) = \frac{\pi(x^{,})j_m(x^{,})g^{,}_m(u^{,})}{\pi(x)j_m(x)g_m(u)}
-	| \frac{\partial(\theta^{,}_{k^{,}}, u^{,})}{(\theta_k, u)} |.
+A_p(x, x^{,}) = min\{1, \frac{\pi(x^{,})j_p(x^{,})g^{,}_p(u^{,})}{\pi(x)j_p(x)g_p(u)}
+\begin{vmatrix} \frac{\partial(\theta^{,}_{k^{,}}, u^{,})}{(\theta_k, u)} \end{vmatrix}\}.
 \end{align}
 Je třeba poznamenat, že Jacobián vstupuje do výrazu jen proto, že návrhová distribuce je určena nepřímo a ne kvůli toho, že se mění dimenze \cite{green2009reversible}. 
+%Reversible jump se skládá jak z dopředného kroku, která vezme současný stav $x = (k, \theta_k)$ do stavu nového $x^{,} = (k^{,}, \theta_k^{,})$, tak ze zpětného kroku, který provede opačný skok. Tyto přeskoky budeme indexovat v počitatelné množině $\mathcal{M}$ a pro každý přeskok $m \in \mathcal{M}$ máme pravděpodobnost, že se o něj pokusíme v současném stavu $x$ a tu značíme $j_m(x)$. Z každého modelu k, bude obvykle jen několik skoků o které se můžeme pokusit, většinou to budou takové skoky, které budou skákat do nejbližších možných dimenzí. Takže třeba v našem případě povolíme skok jen do modelu, který ma buď o jeden bod více nebo méně. Pro skok vpřed vygenerujeme $r_m$ náhodných čísel ze známé sdružené distribuce $g_m$ a nový stav $\theta^{,}_{k^{,}}$ je konstruován takto $(\theta^{,}_{k^{,}}, u^{,}) = h_m(\theta_k, u)$. Tady $u^{,}$ je $r^{,}_m$ náhodných čísel ze sdružené distribuce $g^{,}_m$, které jsou potřeba pro zpětný krok z $\theta^{,}_{k^{,}}$ do $\theta_k$ za použití inverzní funkce $h^,_m$.
+%Důležité pro ně je, aby platilo $n + r = n^{'} + r^{'}$, tedy aby byly diferencovatelné.
+
+% V našem případě může jeden skok sloužit například k určení kde se objeví x-ová a y-ová souřadnice bodu, který přibude v modelu s vyšší dimenzí. Takže například:
+%\begin{align}
+%	h(\sigma^2, s_1, h_1, s_2, h_2, u_1, u_2) = (\sigma^2, s_1, h_1, u_1(s_2-s_1), u_2(h_2-h_1)), \\
+%	h^{'}(\sigma^2, s_1, h_1, s_2, h_2, s_3, h_3) = (\sigma^2, s_1, h_1, s_3, h_3, \frac{s_2}{s_3-s_1}, \frac{h_2}{h_3-h_1}), \\
+%	u_1 \sim U(0, 1), \\
+%	u_2 \sim N(0.5, 3).
+%\end{align}
+%Na našem příkladě vidíme, že podmínka rovnajících se dimenzí je zachována a taky, že u inverzní transformace nemáme žádnou náhodnou veličinu a obecně ani není potřeba \ref{green}. \par
+
+
 \subsection{Algoritmus}
 \begin{lstlisting}[label=src:trans_step,caption=Algoritmus pro mezi dimenzionální skok]
 def trans_step(x, m):
@@ -485,27 +495,22 @@ for i in range(1, n):
 \end{lstlisting}
 Pseudokód \ref{src:rjmcmc} popisuje jak funguje celý algoritmus RJMCMC. V tom, kdy se pokusit o přechod mezi dimenzemi, máme značnou volnost, jedna možnost je určit pokus o takovýto krok deterministicky, takže například každou desátou iteraci se pokusíme o přeskok. Při výběru o jaký přeskok se pokusíme, postupujeme obdobně. Při výběru konkrétního kroku je asi implementačně jednodušší vybírat typ kroku náhodně podle předem zadaných pravděpodobností. A to z toho důvodu, že možností jak změnit dimenzi může být značné množství, ale ne každý krok je přístupný z každé dimenze. U kroků, které nemají být přístupny z dané dimenze, můžeme nastavit nulovou pravděpodobnost a tím zajistíme, že se o ně nikdy nepokusíme. Pokud se nepokoušíme o přechod mezi dimenzemi, použijeme treba MH pro získání dalšího vzorku v rámci současného modelu.
 \subsection{Příklad}
-Na simulovaných datech si nyní ukážeme, jak algoritmus funguje i s jeho nastavením. Algoritmus RJMCMC jsme implementovali v programovacím jazyce Python\cite{python} za využití knihoven NumPy\cite{numpy} a SciPy\ref{scipy}. Tyto knihovny jsme využili především kvůli toho, že je v nich dobrá dostupnost různých pravděpodobnostních rozdělení, které se dají využít jak k výpočtu pravděpodobnostních hustot, tak ke generování vzorku z daných distribucí. Dále jsme použili knihovnu Theano\cite{theano} a to k implementaci transformačních funkcí a především k symbolickému výpočtu jejich Jakobiánů. \par
-Model bude vždy stejný a to sice model zadefinovaný zde \ref{supermodel}. Omezíme se na model s maximálně dvěma zlomy. Přechod mezi modelem beze zlomu a modelem s jedním zlomem  a zpátky vypadá následovně:
+Na simulovaných datech si nyní ukážeme, jak algoritmus funguje i s jeho nastavením. Algoritmus RJMCMC jsme implementovali v programovacím jazyce Python\cite{python} za využití knihoven NumPy\cite{numpy} a SciPy\cite{scipy}. Tyto knihovny jsme využili především kvůli toho, že je v nich dobrá dostupnost různých pravděpodobnostních rozdělení, které se dají využít jak k výpočtu pravděpodobnostních hustot, tak ke generování vzorku z daných distribucí. Dále jsme použili knihovnu Theano\cite{theano} a to k implementaci transformačních funkcí a především k symbolickému výpočtu jejich Jakobiánů. \par
+Model bude vždy stejný a to sice model zadefinovaný zde \ref{supermodel}. Omezíme se na model s maximálně 30 zlomy, je to hlavně technické omezení, později uvidíme, že se reálně k 30 zlomům nepřiblížíme. Možností jak volit transformační funkce mezi dvěma modely je obecně nekonečno. Transformaci pro přechod mezi modelem s $m$ zlomy a $m+1$ zlomy volíme takto:
 \begin{align*}
-	h_1(\sigma^2, s_1, h_1, s_2, h_2, u, n) = 
-	(\sigma^2, s_1, h_1, s_1 + (s_2 - s_1)u, h_1 + (h_2 - h_1)u_1 + n, s_2, h_2), \\
-	 kde\ u \sim U(0, 1),\
-	n \sim N(0, 3) \\
-	h_1^{,}(\sigma^2, s_1, h_1, s_2, h_2, s_3, h_3) = 
-	(\sigma^2, s_1, h_1, s_3, h_3, u, h_2 - h_1 - (h_3 - h_1)u), \\ 
-	kde\ u = \frac{s_2 - s_1}{s_3 - s_1}.
+	h_p(\sigma^2, s_1, h_1, s_2, h_2, ..., s_m, h_m, u, n) = \\
+	(\sigma^2, s_1, h_1, s_1 + (s_2 - s_1)u, h_1 + (h_2 - h_1)u_1 + n, s_2, h_2, s_3, h_3, ..., s_m, h_m), \\
+	 kde\ u \sim U(0, 1), \\
+	n \sim N(0, 3). \\
 \end{align*}
-Náhodná veličina $u$ slouží k určení, kde mezi počátečním a koncovým bodem by se měl nacházet nový bod. Náhodná veličina $n$ určuje to, o kolik výš nebo níž by měl nový bod být oproti původní přímce. Jak je vidět v kroku zpět se nepoužívají žádné náhodné veličiny, ale dopočítavají se jaké by musely být hodnoty $u$ a $n$, kdybychom chtěli přejít z jednoduššího modelu do složitějšího. Tyto hodnoty je důležité vědet, protože i na nich závisí jaká bude přechodová pravděpodobnost, jak je vidět v \ref{rjmcmc_probability}. Pro přechod mezi modely s jedním zlomem a dvěma a zpět použiváme podobnou transformaci:
+Náhodná veličina $u$ slouží k určení, kde mezi počátečním a koncovým bodem by se měl nacházet nový bod. Náhodná veličina $n$ určuje to, o kolik výš nebo níž by měl nový bod být oproti původní přímce. V této transformaci je vidět, že spojitou po částech lineární funkci lámeme mezi body 1 a 2,  
+Zpětná transformace je zvolena takto:
 \begin{align*}
-	h_1(\sigma^2, s_1, h_1, s_2, h_2, s_3, h_3, u, n) = 
-	(\sigma^2, s_1, h_1, s_2, h_2, s_2 + (s_3 - s_2)u, h_2 + (h_3 - h_2)u + n, s_3, h_3), \\
-	kde\ u \sim U(0, 1),\
-	n \sim N(0, 3) \\
-	h_1^{,}(\sigma^2, s_1, h_1, s_2, h_2, s_3, h_3, s_4, h_4) = 
-	(\sigma^2, s_1, h_1, s_2, h_2, s_4, h_4, u, h_3 - h_2 - (h_4 - h_2)u), \\ 
-	kde\ u = \frac{s_3 - s_2}{s_4 - s_2}.
+\	h_p^{,}(\sigma^2, s_1, h_1, s_2, h_2, ..., s_{m+1}, h_{m+1}) = \\
+(\sigma^2, s_1, h_1, s_3, h_3, ..., s_{m+1}, h_{m+1}, u, h_2 - h_1 - (h_3 - h_1)u), \\ 
+kde\ u = \frac{s_2 - s_1}{s_3 - s_1}.
 \end{align*}
+Jak je vidět v kroku zpět se nepoužívají žádné náhodné veličiny, ale dopočítavají se jaké by musely být hodnoty $u$ a $n$, kdybychom chtěli přejít z jednoduššího modelu do složitějšího. Tyto hodnoty je důležité vědet, protože i na nich závisí jaká bude přechodová pravděpodobnost, jak je vidět v \ref{rjmcmc_probability}. \par \par
 Jako návrhovou distribuci v rámci přechodů uvnitř modelu beze zlomů jsme zvolili $q(x^* | x) \sim \mathcal{N}(x, 5I)$, kde $I$ je jednotková matice $5\times5$, s jednou modifikací a to, že pro $\sigma^2$ se přijímají jen vzorky větší než nula. Podobné návrhové distribuce se používají v modelech s vyšší dimenzí. Simulované data pro tento příklad jsou $x = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)$, $y = (12 + e_1, 10 + e_2, 8 + e_3, 6 + e_4, 4 + e_5, 2 + e_6, 4 + e_7, 6 + e_8, 8 + e_9, 10 + e_10, 12 + e_11)$, kde $e_i \sim \mathcal{N}(0, 0.1)$. Algoritmus jsme nechali běžet o 20000 iterací. A prvotní vzorek je náhodně vygenerovaný vzorek začínající v modelu beze zlomu. 
 \begin{figure}
 	[H]\centering\includegraphics[width=0.8\textwidth]{images/ks_example_V.png}\caption{Vykreslení přeskoku mezi dimenzemi}\label{priklad1_prechody}

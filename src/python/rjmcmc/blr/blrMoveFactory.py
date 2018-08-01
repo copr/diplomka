@@ -22,8 +22,18 @@ class BlrMoveFactory(AbstractMoveFactory):
         moves = []
         u = uniform(0, 1)
         n = normal(0, 1)
+
+        step = 1
+        if 5 < k <= 10:
+            step = 2
+        if 10 < k <= 15:
+            step = 3
+        if 15 < k <= 20:
+            step = 5
+        if 20 < k:
+            7
         # moves up
-        for i in range(k+1):
+        for i in range(0, k+1, step):
             t_up, j_up = self._create_transformation_up(k, i)
             t_down, j_down = self._create_transformation_down(k+1, i)
             u_gen_up = ProposalDistribution(lambda x: u.pdf(x[0])*n.pdf(x[1]),
@@ -33,7 +43,7 @@ class BlrMoveFactory(AbstractMoveFactory):
                         u_gen_up, None, 2, 0)
             moves.append(move)
         # moves down
-        for i in range(k):
+        for i in range(0, k, step):
             t_up, j_up = self._create_transformation_up(k-1, i)
             t_down, j_down = self._create_transformation_down(k, i)
             u_gen_up = ProposalDistribution(lambda x: u.pdf(x[0])*n.pdf(x[1]),

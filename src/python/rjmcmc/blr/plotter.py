@@ -15,11 +15,19 @@ class Plotter:
         self._sort_samples(samples)
 
     def plot_hist_jumps(self):
-        plt.hist(self.ks)
+        n = len(self.sorted_samples.keys())
+        m = len(self.samples)
+        probs = [len(self.sorted_samples[key])/m for key in self.sorted_samples]
+        plt.bar(list(self.sorted_samples.keys()), probs, align='center')
+        plt.xticks(list(self.sorted_samples.keys()))
+        plt.xlabel("m")
+        plt.ylabel("aproximace aposteriorní pravdepodobnosti modelu")
         plt.show()
 
     def plot_time_line_jumps(self):
         plt.plot(self.ks)
+        plt.xlabel("i-ta iterace")
+        plt.ylabel("m")
         plt.show()
 
     def plot_lines(self, k, every_nth=50, opacity=0.1):

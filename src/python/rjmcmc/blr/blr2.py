@@ -7,7 +7,7 @@ class Blr2:
     '''
     Trida, ktera vytvori stacionarni distribuci pro regresi s n zlomy.
     2 protoze pouzivam jinou parametrizaci.
-    sigma = x[0] - rozptyl no :D
+    sigma = x[0] - rozptyl 
     s0 = x[1] - xova souradnice prvniho zlomu
     h0 = x[2] - yova souradnice prvnhio zlomu
     ...
@@ -25,22 +25,22 @@ class Blr2:
             raise RuntimeError("Not matching dimension. Dimension xs=" + str(len(xs)) + " Dimension ys=" + str(len(ys)))
         self.xs = xs
         self.ys = ys
+        self.max_y = max(ys)
+        self.min_y = min(ys)
         self.max_x = max(xs)
         self.min_x = min(xs)
         self.n = 2*n_breaks + 5
         self.n_samples = len(xs)
-        self.h_prior = normal(np.zeros(int((self.n-1)/2)),
-                              100*np.eye(int((self.n-1)/2)))
-        self.sigma_prior = normal(0, 3)
+        self.sigma_prior = normal(3, 0.2)
         self.n_breaks = n_breaks
-        
+        self.h_prior = uniform(min(ys) - 5, (max(ys) + 5) - (min(ys) - 5))
+
     def prior_s(self, theta):
         '''
         Apriorni rozdeleni na thetaovych souradnicich. Tedy melo by platit
         ss < s1 < s2 < ... < sn < sf. Je to tak nastaveno z toho duvodu,
         aby bylo dodrzeni poradi
         '''
-        # taky si nejsem jisty jestli prochazim vsechny
         x_coordinates = [theta[i] for i in range(1, self.n, 2)]
         previous = x_coordinates[0]
         for i in range(1, len(x_coordinates)):
@@ -48,21 +48,21 @@ class Blr2:
                 return 0
             previous = x_coordinates[i]
 
-        if x_coordinates[0] < self.min_x - 0.1:
+        if x_coordinates[0] < self.min_x:
             return 0
-        if x_coordinates[len(x_coordinates) - 1] > self.max_x + 0.1:
+        if x_coordinates[len(x_coordinates) - 1] > self.max_x:
             return 0
         return 1
 
     def prior_h(self, theta):
         '''
         Apriorni rozdeleni na yovych souradnicich. Je teda co nejvic
-        neinformativni, tedy pro vsechny h plati, ze h ~ N(0, 100)
+        neinformativni, tedy pro vsechny h plati, ze h ~ U(y_min - 1, y_max + 1)
         '''
         # tady se trochu bojim ze neprojdu vsechny
         # jestli se dostanu za hranici tak se to rychle odhali :D
         y_coordinates = [theta[i] for i in range(2, self.n, 2)]
-        return self.h_prior.pdf(y_coordinates)
+        return np.prod(self.h_prior.pdf(y_coordinates))
 
     def prior_sigma(self, theta):
         '''
@@ -106,9 +106,6 @@ class Blr2:
             bs = theta[0]**(-len(self.xs)/2)
             return bs * exp
         except FloatingPointError:
-            print()
-            print('theta0 ' + str(theta[0]))
-            print('suma ' + str(suma))
             return 0
 
     def prob_sum(self, x, y, break1, break2):

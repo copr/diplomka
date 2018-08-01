@@ -56,17 +56,19 @@ def individual_samples(samples, dimension):
 
 
 def plot_lines(xs, ys, samples, dimension, nth, alpha, origx, origy):
+    plt.plot(origx, origy, 'b')
     for i in range(0, len(samples), nth):
         sample = samples[i]
         xss = [sample[i] for i in range(1, dimension, 2)]
         yss = [sample[i] for i in range(2, dimension, 2)]
         plt.plot(xss, yss, 'g', alpha=alpha)
     plt.plot(xs, ys, 'bo')
-    plt.plot(origx, origy, 'b')
     xmax = max(xs)
     xmin = min(xs)
     ymax = max(ys)
     ymin = min(ys)
+    plt.legend(['skutecna regresni funkce', 'vzorky regresni funkce'])
+
     plt.axis([xmin-1, xmax+1, ymin-1, ymax+1])
     plt.show()
 
